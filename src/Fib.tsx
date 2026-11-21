@@ -147,7 +147,7 @@ const S2: React.FC = () => {
 
 /* ---------------- S3：竖式相加 ---------------- */
 const ADD_TERMS: [string, number][] = [
-  ['1', 1], ['1', 2], ['2', 3], ['3', 4], ['5', 5], ['8', 6], ['13', 7], ['21', 8], ['34', 9],
+  ['1', 1], ['1', 2], ['2', 3], ['3', 4], ['5', 5], ['8', 6], ['13', 7],
 ];
 const GRID_X = 700;
 const GRID_CELL = 58;
@@ -155,8 +155,8 @@ const colX = (col: number) => GRID_X + (col - 1) * GRID_CELL;
 
 const Addend: React.FC<{ f: string; k: number; y: number; o: number; big?: boolean }> = ({ f, k, y, o, big }) => (
   <>
-    <div style={{ position: 'absolute', left: GRID_X - 96, top: y, width: 50, textAlign: 'right', fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>+</div>
-    <div style={{ position: 'absolute', left: GRID_X - 66, top: y, fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>0.</div>
+    <div style={{ position: 'absolute', left: GRID_X - 150, top: y, width: 50, textAlign: 'right', fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>+</div>
+    <div style={{ position: 'absolute', left: GRID_X - 112, top: y, fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>0.</div>
     {Array.from({ length: k + 1 - f.length }).map((_, j) => (
       <div key={`z${j}`} style={{ position: 'absolute', left: colX(j + 1), top: y, fontFamily: MONO, fontSize: 46, color: 'rgba(125,141,161,0.28)', opacity: o }}>0</div>
     ))}
@@ -174,7 +174,7 @@ const Addend: React.FC<{ f: string; k: number; y: number; o: number; big?: boole
 
 const S3: React.FC = () => {
   const lt = useLocal(2);
-  const y0 = 200;
+  const y0 = 300;
   return (
     <>
       <Label x={300} y={140} text="sum them · one digit per row" />
@@ -184,10 +184,10 @@ const S3: React.FC = () => {
       {ADD_TERMS.map(([f, k], i) => {
         const o = appear(lt, 0.5 + i * 0.42, 0.3);
         const shift = (1 - o) * -30;
-        return <Addend key={i} f={f} k={k} y={y0 + i * 58 + shift} o={o} />;
+        return <Addend key={i} f={f} k={k} y={y0 + i * 62 + shift} o={o} />;
       })}
-      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 58 + 8, width: 11 * GRID_CELL, height: 2, background: DIM, opacity: appear(lt, 4.8) }} />
-      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 58 + 30, fontFamily: MONO, fontSize: 50, opacity: appear(lt, 5.1) }}>
+      <div style={{ position: 'absolute', left: GRID_X - 112, top: y0 + ADD_TERMS.length * 62 + 8, width: 11 * GRID_CELL, height: 2, background: DIM, opacity: appear(lt, 4.8) }} />
+      <div style={{ position: 'absolute', left: GRID_X - 112, top: y0 + ADD_TERMS.length * 62 + 30, fontFamily: MONO, fontSize: 50, opacity: appear(lt, 5.1) }}>
         <span style={{ color: DIM }}>0.</span>
         <span style={{ color: CYAN }}>011235</span>
         <span style={{ color: AMBER }}>9</span>
