@@ -1,0 +1,27 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: DS,Noto Sans CJK SC,52,&H00FAF4E8,&H00FAF4E8,&H00201008,&HC8000000,1,0,0,0,100,100,1,0,4,0,0,2,120,120,58,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.04,0:00:03.43,DS,,0,0,0,,地球上最黑的地方不在太空
+Dialogue: 0,0:00:03.43,0:00:04.16,DS,,0,0,0,,在海里。
+Dialogue: 0,0:00:05.73,0:00:08.22,DS,,0,0,0,,光只能往下走两百米，再往下
+Dialogue: 0,0:00:08.22,0:00:09.47,DS,,0,0,0,,就没有白天了。
+Dialogue: 0,0:00:10.51,0:00:12.84,DS,,0,0,0,,一千米以下，是彻底的黑暗
+Dialogue: 0,0:00:12.84,0:00:14.09,DS,,0,0,0,,连蓝色都不剩。
+Dialogue: 0,0:00:15.18,0:00:16.55,DS,,0,0,0,,可这里住着的动物
+Dialogue: 0,0:00:16.55,0:00:17.62,DS,,0,0,0,,比陆地上还多。
+Dialogue: 0,0:00:18.70,0:00:19.43,DS,,0,0,0,,没有光
+Dialogue: 0,0:00:19.43,0:00:20.90,DS,,0,0,0,,它们就自己造光。
+Dialogue: 0,0:00:21.92,0:00:23.15,DS,,0,0,0,,有的拿来钓猎物
+Dialogue: 0,0:00:23.15,0:00:24.68,DS,,0,0,0,,有的拿来假装成别人。
+Dialogue: 0,0:00:25.73,0:00:27.92,DS,,0,0,0,,我们在纪录片里看到的那些颜色
+Dialogue: 0,0:00:27.92,0:00:29.67,DS,,0,0,0,,其实是我们打灯打出来的。
+Dialogue: 0,0:00:31.72,0:00:33.44,DS,,0,0,0,,在黑暗里游了两亿年
+Dialogue: 0,0:00:33.44,0:00:35.68,DS,,0,0,0,,它们从没觉得黑有什么不对。
