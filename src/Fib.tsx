@@ -174,26 +174,26 @@ const Addend: React.FC<{ f: string; k: number; y: number; o: number; big?: boole
 
 const S3: React.FC = () => {
   const lt = useLocal(2);
-  const y0 = 250;
+  const y0 = 200;
   return (
     <>
-      <Label x={300} y={150} text="sum them · one digit per row" />
+      <Label x={300} y={140} text="sum them · one digit per row" />
       <div style={{ position: 'absolute', left: 300, top: 190, fontFamily: MONO, fontSize: 46, color: INK, opacity: appear(lt, 0.05) }}>
         <span style={{ color: DIM }}>1/89 = </span>0.011235955…
       </div>
       {ADD_TERMS.map(([f, k], i) => {
         const o = appear(lt, 0.5 + i * 0.42, 0.3);
         const shift = (1 - o) * -30;
-        return <Addend key={i} f={f} k={k} y={y0 + i * 62 + shift} o={o} />;
+        return <Addend key={i} f={f} k={k} y={y0 + i * 58 + shift} o={o} />;
       })}
-      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 62 + 8, width: 11 * GRID_CELL, height: 2, background: DIM, opacity: appear(lt, 4.8) }} />
-      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 62 + 30, fontFamily: MONO, fontSize: 50, opacity: appear(lt, 5.1) }}>
+      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 58 + 8, width: 11 * GRID_CELL, height: 2, background: DIM, opacity: appear(lt, 4.8) }} />
+      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 58 + 30, fontFamily: MONO, fontSize: 50, opacity: appear(lt, 5.1) }}>
         <span style={{ color: DIM }}>0.</span>
         <span style={{ color: CYAN }}>011235</span>
         <span style={{ color: AMBER }}>9</span>
         <span style={{ color: DIM }}>…</span>
       </div>
-      <div style={{ position: 'absolute', left: 300, top: y0 + ADD_TERMS.length * 62 + 40, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6) }}>
+      <div style={{ position: 'absolute', left: 300, top: y0 + ADD_TERMS.length * 58 + 40, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6) }}>
         每一行都比上一行小十倍 → 斜着排下来
       </div>
     </>
@@ -203,12 +203,12 @@ const S3: React.FC = () => {
 /* ---------------- S4：进位 ---------------- */
 const S4: React.FC = () => {
   const lt = useLocal(3);
-  const y0 = 400;
+  const y0 = 330;
   const rows: [string, number][] = [['5', 5], ['8', 6], ['13', 7], ['21', 8], ['34', 9]];
   return (
     <>
       <Label x={300} y={150} text="carry · the pattern breaks" />
-      <div style={{ position: 'absolute', left: GRID_X - 66, top: 220, fontFamily: MONO, fontSize: 52, color: INK, opacity: appear(lt, 0.05) }}>
+      <div style={{ position: 'absolute', left: GRID_X - 66, top: 200, fontFamily: MONO, fontSize: 52, color: INK, opacity: appear(lt, 0.05) }}>
         <span style={{ color: DIM }}>0.</span>
         <span style={{ color: CYAN }}>011235</span>
         <span style={{ color: AMBER }}>9</span>
@@ -216,16 +216,16 @@ const S4: React.FC = () => {
       </div>
       {rows.map(([f, k], i) => {
         const o = appear(lt, 0.15 + i * 0.16, 0.3);
-        return <Addend key={i} f={f} k={k} y={y0 + i * 88} o={o} big={k === 7} />;
+        return <Addend key={i} f={f} k={k} y={y0 + i * 84} o={o} big={k === 7} />;
       })}
       <svg width={1920} height={1080} style={{ position: 'absolute' }}>
-        <path d={`M ${colX(8) + 14} ${y0 + 2 * 88 + 40} C ${colX(9) + 40} ${y0 + 2 * 88}, ${colX(9) + 30} 300, ${colX(8) + 10} 282`}
+        <path d={`M ${colX(8) + 14} ${y0 + 2 * 84 + 40} C ${colX(9) + 40} ${y0 + 2 * 84}, ${colX(9) + 30} 300, ${colX(8) + 10} 282`}
           stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={300} strokeDashoffset={300 * (1 - appear(lt, 2.0, 0.8))} />
-        <path d={`M ${colX(9) + 26} ${y0 + 2 * 88 + 40} C ${colX(10) + 60} ${y0 + 2 * 88 - 20}, ${colX(10) + 40} 320, ${colX(9) + 20} 282`}
+        <path d={`M ${colX(9) + 26} ${y0 + 2 * 84 + 40} C ${colX(10) + 60} ${y0 + 2 * 88 - 20}, ${colX(10) + 40} 320, ${colX(9) + 20} 282`}
           stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={340} strokeDashoffset={340 * (1 - appear(lt, 2.4, 0.8))} />
       </svg>
-      <div style={{ position: 'absolute', left: colX(9) + 70, top: 300, fontFamily: MONO, fontSize: 24, color: AMBER, opacity: appear(lt, 2.8) }}>carry</div>
-      <div style={{ position: 'absolute', left: 300, top: y0 + 5 * 88 + 20, fontFamily: MONO, fontSize: 30, color: DIM, opacity: appear(lt, 3.4) }}>
+      <div style={{ position: 'absolute', left: colX(9) + 70, top: 280, fontFamily: MONO, fontSize: 24, color: AMBER, opacity: appear(lt, 2.8) }}>carry</div>
+      <div style={{ position: 'absolute', left: 300, top: y0 + 5 * 84 + 20, fontFamily: MONO, fontSize: 30, color: DIM, opacity: appear(lt, 3.4) }}>
         13 占两位 → 往后每一位都被推右一格
       </div>
     </>
