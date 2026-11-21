@@ -193,8 +193,8 @@ const S3: React.FC = () => {
         <span style={{ color: AMBER }}>9</span>
         <span style={{ color: DIM }}>…</span>
       </div>
-      <div style={{ position: 'absolute', left: 300, top: y0 + ADD_TERMS.length * 58 + 40, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6) }}>
-        每一行都比上一行小十倍 → 斜着排下来
+      <div style={{ position: 'absolute', left: 300, top: 300, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6), width: 300, lineHeight: 1.6 }}>
+        每一行都比上一行小十倍 →<br />斜着排下来
       </div>
     </>
   );
