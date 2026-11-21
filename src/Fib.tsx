@@ -68,8 +68,9 @@ const S1: React.FC = () => {
         1 / 89
       </div>
       <div style={{ position: 'absolute', left: startX, top: baseY + 150, fontFamily: MONO, fontSize: 38, color: DIM, opacity: appear(lt, 1.0) }}>
-        1 ÷ 89 = 0.
+        1 ÷ 89 =
       </div>
+      <div style={{ position: 'absolute', left: startX + 210, top: baseY + 105, fontFamily: MONO, fontSize: 66, color: DIM, opacity: appear(lt, 1.0) }}>0.</div>
       {DIGITS.slice(0, 20).map((d, i) => {
         const at = 1.05 + i * 0.11;
         const o = appear(lt, at, 0.12);
@@ -79,14 +80,14 @@ const S1: React.FC = () => {
         return (
           <div key={i} style={{
             position: 'absolute',
-            left: startX + 210 + i * cell,
+            left: startX + 280 + i * cell,
             top: baseY + 105 - (1 - o) * 14,
             fontFamily: MONO, fontSize: 66, color: col, opacity: o,
           }}>{d}</div>
         );
       })}
-      <div style={{ position: 'absolute', left: startX + 210, top: baseY + 196, width: 6 * cell + cell * 0.42, height: 2, background: CYAN, opacity: appear(lt, 1.9) * 0.6 }} />
-      <div style={{ position: 'absolute', left: startX + 210 + 6 * cell, top: baseY + 196, width: cell * 0.42, height: 2, background: AMBER, opacity: appear(lt, 1.9) * 0.6 }} />
+      <div style={{ position: 'absolute', left: startX + 280, top: baseY + 196, width: 6 * cell + cell * 0.42, height: 2, background: CYAN, opacity: appear(lt, 1.9) * 0.6 }} />
+      <div style={{ position: 'absolute', left: startX + 280 + 6 * cell, top: baseY + 196, width: cell * 0.42, height: 2, background: AMBER, opacity: appear(lt, 1.9) * 0.6 }} />
       <div style={{ position: 'absolute', left: startX + 210, top: baseY + 224, fontFamily: MONO, fontSize: 22, color: DIM, opacity: appear(lt, 2.0) }}>
         <span style={{ color: CYAN }}>fibonacci</span> · <span style={{ color: AMBER }}>and then?</span>
       </div>
@@ -128,7 +129,7 @@ const S2: React.FC = () => {
         const o = appear(lt, 0.1, 0.3);
         return (
           <div key={i} style={{
-            position: 'absolute', left: startX + 210 + i * cell, top: baseY + 105,
+            position: 'absolute', left: startX + 280 + i * cell, top: baseY + 105,
             fontFamily: MONO, fontSize: 62,
             color: i < 6 ? CYAN : i === 6 ? AMBER : INK, opacity: o,
           }}>{d}</div>
@@ -309,7 +310,7 @@ export const Fib: React.FC = () => {
     <AbsoluteFill>
       <AbsoluteFill style={{ transform: `scale(${zoom})`, opacity: fadeIn * fadeOut }}>
         <Grid />
-        <div style={{ position: 'absolute', inset: 0, transform: 'scale(1.12) translateY(9%)', transformOrigin: '50% 50%' }}>
+        <div style={{ position: 'absolute', inset: 0, transform: 'scale(1.12) translateY(14%)', transformOrigin: '50% 50%' }}>
         {idx === -1 && (
           <>
             <Label x={280} y={300} text="a small puzzle" />
