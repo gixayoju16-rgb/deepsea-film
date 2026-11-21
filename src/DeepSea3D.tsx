@@ -41,7 +41,7 @@ function camAt(t: number) {
 const Setup: React.FC = () => {
   const { gl, scene } = useThree();
   gl.toneMapping = THREE.ACESFilmicToneMapping;
-  gl.toneMappingExposure = 1.45;
+  gl.toneMappingExposure = 1.18;
   scene.background = new THREE.Color('#02070d');
   return null;
 };
@@ -51,12 +51,12 @@ const Surface: React.FC = () => (
   <group>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
       <planeGeometry args={[600, 600]} />
-      <meshStandardMaterial color="#123e58" roughness={0.34} metalness={0.0} />
+      <meshStandardMaterial color="#0a2536" roughness={0.5} metalness={0.1} />
     </mesh>
     {/* 天光带 */}
     <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[220, 220]} />
-      <meshBasicMaterial color="#2f86ad" transparent opacity={0.35} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <meshBasicMaterial color="#1d6485" transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
     </mesh>
   </group>
 );
@@ -66,25 +66,29 @@ const Boat: React.FC = () => {
   const sail = useMemo(() => {
     const s = new THREE.Shape();
     s.moveTo(0, 0);
-    s.lineTo(0, 10);
-    s.lineTo(6.2, 0.6);
+    s.lineTo(0, 15);
+    s.lineTo(9.4, 0.5);
     s.lineTo(0, 0);
     return new THREE.ShapeGeometry(s);
   }, []);
   return (
     <group position={[0, 0.3, 0]}>
       {/* 船体 */}
-      <mesh position={[0, 0.6, 0]}>
-        <boxGeometry args={[10, 1.5, 3.2]} />
-        <meshStandardMaterial color="#e6f4fb" roughness={0.55} emissive="#7fb7d0" emissiveIntensity={0.18} />
+      <mesh position={[0, 0.7, 0]}>
+        <boxGeometry args={[13, 1.7, 3.6]} />
+        <meshStandardMaterial color="#dcecf5" roughness={0.5} emissive="#6fa9c4" emissiveIntensity={0.12} />
+      </mesh>
+      <mesh position={[7.4, 0.7, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[1, 1, 1]}>
+        <coneGeometry args={[1.8, 3.2, 4]} />
+        <meshStandardMaterial color="#d3e6f0" roughness={0.5} />
       </mesh>
       {/* 桅杆 */}
-      <mesh position={[-0.4, 5.6, 0]}>
-        <cylinderGeometry args={[0.12, 0.12, 10, 8]} />
+      <mesh position={[-0.4, 8.2, 0]}>
+        <cylinderGeometry args={[0.14, 0.14, 15, 8]} />
         <meshStandardMaterial color="#d8ecf5" />
       </mesh>
       {/* 主帆 */}
-      <mesh geometry={sail} position={[-0.3, 0.9, 0.05]}>
+      <mesh geometry={sail} position={[-0.3, 1.2, 0.05]}>
         <meshStandardMaterial color="#f4fbff" emissive="#9fd3e8" emissiveIntensity={0.22} roughness={0.7} side={THREE.DoubleSide} />
       </mesh>
       {/* 舷窗光 */}
@@ -211,7 +215,7 @@ const School: React.FC<{ t: number }> = ({ t }) => {
         y: -72 + (Math.random() - 0.5) * 34,
         z: (Math.random() - 0.5) * 80,
         x0: (Math.random() - 0.5) * 160,
-        s: 1.8 + Math.random() * 2.4,
+        s: 1.2 + Math.random() * 1.6,
         sp: 2.5 + Math.random() * 3.5,
         ph: Math.random() * 6.28,
       })),
@@ -229,11 +233,11 @@ const School: React.FC<{ t: number }> = ({ t }) => {
           >
             <sphereGeometry args={[1, 14, 10]} />
             <meshStandardMaterial
-              color="#123a4d"
-              roughness={0.55}
-              metalness={0.15}
-              emissive="#1d5a75"
-              emissiveIntensity={0.35}
+              color="#0d2a38"
+              roughness={0.4}
+              metalness={0.35}
+              emissive="#1f6b88"
+              emissiveIntensity={0.7}
             />
           </mesh>
         );
@@ -251,9 +255,9 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
       <mesh>
         <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
-          color="#a7efff"
-          emissive="#38b9de"
-          emissiveIntensity={1.1}
+          color="#6fd8f0"
+          emissive="#1fa9cc"
+          emissiveIntensity={1.8}
           transparent
           opacity={0.4}
           roughness={0.18}
@@ -262,7 +266,7 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
       </mesh>
       <mesh position={[0, -1.4, 0]}>
         <sphereGeometry args={[4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
-        <meshStandardMaterial color="#7fe0f8" emissive="#2f9fc4" emissiveIntensity={1.6} transparent opacity={0.4} />
+        <meshStandardMaterial color="#5fd0ea" emissive="#1b8fb0" emissiveIntensity={2.0} transparent opacity={0.4} />
       </mesh>
       <pointLight color="#6fe0ff" intensity={45} distance={50} decay={2} />
       {tents.map((a, i) => (
@@ -273,7 +277,7 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
         >
           <cylinderGeometry args={[0.07, 0.02, 14, 5]} />
           <meshStandardMaterial
-            color="#bdf1ff"
+            color="#8fe6ff"
             emissive="#5fd0ea"
             emissiveIntensity={1.4}
             transparent
@@ -300,11 +304,11 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
     <group position={[-8, -128, -2]} rotation={[0, 0.55, 0]}>
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
-          color="#20434f"
-          roughness={0.55}
-          metalness={0.25}
-          emissive="#123340"
-          emissiveIntensity={0.35}
+          color="#2b5a6b"
+          roughness={0.45}
+          metalness={0.3}
+          emissive="#1c5567"
+          emissiveIntensity={0.6}
         />
       </mesh>
       {/* 尾鳍 */}
@@ -402,7 +406,7 @@ const Rig: React.FC<{ t: number }> = ({ t }) => {
 const Scene: React.FC<{ t: number }> = ({ t }) => {
   const { scene } = useThree();
   useMemo(() => {
-    scene.fog = new THREE.FogExp2(0x04141f, 0.019);
+    scene.fog = new THREE.FogExp2(0x04141f, 0.026);
   }, [scene]);
   const beamX = useMemo(() => {
     const u = clamp01((t - 25.2) / 5.0);
@@ -419,9 +423,8 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
 
       <Surface />
       <Boat />
-      <Shaft pos={[0, 2, 0]} h={170} w={26} o={0.55} />
-      <Shaft pos={[-6, 2, 6]} h={120} w={12} o={0.35} />
-      <Shaft pos={[7, 2, -4]} h={140} w={16} o={0.3} />
+      <Shaft pos={[-9, 2, -26]} h={180} w={11} o={0.30} />
+      <Shaft pos={[11, 2, -34]} h={160} w={9} o={0.24} />
       <Snow t={t} />
       <School t={t} />
       <Jellyfish t={t} />
@@ -431,7 +434,7 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
 
       {t > 24.6 && (
         <group>
-          <Shaft pos={[beamX, -110, 0]} h={110} w={16} o={0.55} />
+          <Shaft pos={[beamX, -104, -18]} h={120} w={13} o={0.4} />
           <pointLight position={[beamX, -150, 6]} color="#cdf3ff" intensity={60} distance={50} decay={2} />
         </group>
       )}
