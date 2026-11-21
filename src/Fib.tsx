@@ -155,7 +155,7 @@ const colX = (col: number) => GRID_X + (col - 1) * GRID_CELL;
 
 const Addend: React.FC<{ f: string; k: number; y: number; o: number; big?: boolean }> = ({ f, k, y, o, big }) => (
   <>
-    <div style={{ position: 'absolute', left: GRID_X - 150, top: y, width: 50, textAlign: 'right', fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>+</div>
+    <div style={{ position: 'absolute', left: GRID_X - 215, top: y, width: 50, textAlign: 'right', fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>+</div>
     <div style={{ position: 'absolute', left: GRID_X - 112, top: y, fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>0.</div>
     {Array.from({ length: k + 1 - f.length }).map((_, j) => (
       <div key={`z${j}`} style={{ position: 'absolute', left: colX(j + 1), top: y, fontFamily: MONO, fontSize: 46, color: 'rgba(125,141,161,0.28)', opacity: o }}>0</div>
@@ -193,7 +193,7 @@ const S3: React.FC = () => {
         <span style={{ color: AMBER }}>9</span>
         <span style={{ color: DIM }}>…</span>
       </div>
-      <div style={{ position: 'absolute', left: 300, top: 300, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6), width: 300, lineHeight: 1.6 }}>
+      <div style={{ position: 'absolute', left: 250, top: 620, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6), width: 300, lineHeight: 1.6 }}>
         每一行都比上一行小十倍 →<br />斜着排下来
       </div>
     </>
