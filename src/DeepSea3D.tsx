@@ -233,11 +233,11 @@ const School: React.FC<{ t: number }> = ({ t }) => {
           >
             <sphereGeometry args={[1, 14, 10]} />
             <meshStandardMaterial
-              color="#0d2a38"
-              roughness={0.4}
-              metalness={0.35}
-              emissive="#1f6b88"
-              emissiveIntensity={0.7}
+              color="#020a0f"
+              roughness={0.55}
+              metalness={0.1}
+              emissive="#06202b"
+              emissiveIntensity={0.25}
             />
           </mesh>
         );
@@ -255,20 +255,21 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
       <mesh>
         <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
-          color="#6fd8f0"
-          emissive="#1fa9cc"
-          emissiveIntensity={1.8}
+          color="#0a2733"
+          emissive="#12647d"
+          emissiveIntensity={0.85}
           transparent
-          opacity={0.4}
+          opacity={0.92}
           roughness={0.18}
           side={THREE.DoubleSide}
         />
       </mesh>
       <mesh position={[0, -1.4, 0]}>
         <sphereGeometry args={[4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
-        <meshStandardMaterial color="#5fd0ea" emissive="#1b8fb0" emissiveIntensity={2.0} transparent opacity={0.4} />
+        <meshStandardMaterial color="#08222c" emissive="#0f5c73" emissiveIntensity={0.7} transparent opacity={0.85} />
       </mesh>
-      <pointLight color="#6fe0ff" intensity={45} distance={50} decay={2} />
+      <pointLight position={[0, 6, -12]} color="#7fe5ff" intensity={120} distance={60} decay={2} />
+      <pointLight color="#3fc3e0" intensity={16} distance={26} decay={2} />
       {tents.map((a, i) => (
         <mesh
           key={i}
@@ -304,11 +305,11 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
     <group position={[-8, -128, -2]} rotation={[0, 0.55, 0]}>
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
-          color="#2b5a6b"
-          roughness={0.45}
-          metalness={0.3}
-          emissive="#1c5567"
-          emissiveIntensity={0.6}
+          color="#061a22"
+          roughness={0.5}
+          metalness={0.2}
+          emissive="#0a2c39"
+          emissiveIntensity={0.35}
         />
       </mesh>
       {/* 尾鳍 */}
@@ -333,7 +334,7 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
         <meshStandardMaterial color="#fbffff" emissive="#b8f8ff" emissiveIntensity={7} />
       </mesh>
       <pointLight position={[-1.4, 9.2, 0]} color="#b3f6ff" intensity={70} distance={45} decay={2} />
-      <pointLight position={[2, -3, -10]} color="#2fbfe0" intensity={55} distance={40} decay={2} />
+      <pointLight position={[2, 2, -16]} color="#3fd0f0" intensity={130} distance={50} decay={2} />
     </group>
   );
 };
@@ -346,19 +347,20 @@ const RedCreature: React.FC<{ beamX: number }> = ({ beamX }) => {
     <group position={[10, -158, -6]} rotation={[0, -0.4, 0]}>
       <mesh scale={[9, 4.6, 5.4]}>
         <sphereGeometry args={[1, 28, 20]} />
-        <meshStandardMaterial color="#1a2b33" roughness={0.6} metalness={0.2} emissive="#0d1b22" emissiveIntensity={0.3} />
+        <meshStandardMaterial color="#0a1116" roughness={0.55} metalness={0.15} emissive="#0d1b24" emissiveIntensity={0.3} />
       </mesh>
       <mesh scale={[9.06, 4.66, 5.46]}>
         <sphereGeometry args={[1, 28, 20]} />
         <meshStandardMaterial
-          color="#e0455e"
-          emissive="#ff5a70"
-          emissiveIntensity={2.4}
+          color="#8e1c2c"
+          emissive="#e0354c"
+          emissiveIntensity={1.2}
           transparent
-          opacity={0.9 * lit}
+          opacity={0.55 * lit}
           roughness={0.45}
         />
       </mesh>
+      <pointLight position={[0, 0, -14]} color="#ff4a63" intensity={60 * lit} distance={40} decay={2} />
     </group>
   );
 };
