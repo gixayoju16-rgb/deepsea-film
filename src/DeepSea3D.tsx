@@ -472,9 +472,9 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
       <Shaft pos={[13, 2, -62]} h={140} w={9} o={0.20} />
       <Snow t={t} />
       <School t={t} />
-      <Jellyfish t={t} at={ahead} />
-      <Angler t={t} at={ahead} />
-      <RedCreature beamX={beamX} at={ahead} />
+      {t > 15.0 && t < 23.0 && <Jellyfish t={t} at={ahead} />}
+      {t > 20.0 && t < 26.6 && <Angler t={t} at={ahead} />}
+      {t > 24.8 && t < 31.6 && <RedCreature beamX={beamX} at={ahead} />}
       <Floor />
 
       {t > 24.6 && (
