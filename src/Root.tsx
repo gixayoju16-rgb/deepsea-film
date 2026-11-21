@@ -1,18 +1,14 @@
 import React from 'react';
 import { Composition } from 'remotion';
-import { Film3D } from './DeepSea3D';
+import { Fib, TOTAL_FRAMES } from './Fib';
 
-export const Root: React.FC = () => {
-  return (
-    <>
-      <Composition
-        id="DeepSea"
-        component={Film3D}
-        durationInFrames={1116}
-        fps={30}
-        width={1920}
-        height={1080}
-      />
-    </>
-  );
-};
+export const Root: React.FC = () => (
+  <Composition
+    id="DeepSea"
+    component={Fib}
+    durationInFrames={TOTAL_FRAMES}
+    fps={30}
+    width={1920}
+    height={1080}
+  />
+);
