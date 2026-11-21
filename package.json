@@ -2,21 +2,25 @@
   "name": "deepsea-film",
   "version": "1.0.0",
   "private": true,
-  "description": "《深海两千米》Remotion 工程，GitHub Actions 云端渲染",
+  "description": "《深海两千米》three.js 工程，GitHub Actions 云端渲染",
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "render": "remotion render src/index.ts DeepSea out/silent.mp4 --concurrency=4 --image-format=jpeg",
     "still": "remotion still src/index.ts DeepSea out/still.png"
   },
   "dependencies": {
+    "@react-three/fiber": "^8.18.0",
     "@remotion/cli": "4.0.484",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "remotion": "4.0.484"
+    "@remotion/three": "4.0.484",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.484",
+    "three": "^0.169.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.169.0",
     "typescript": "^5.6.0"
   }
 }
