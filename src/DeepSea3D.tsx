@@ -50,8 +50,8 @@ const Setup: React.FC = () => {
 /* ---------- 发光轮廓线（扫描/标本感） ---------- */
 const Wire: React.FC<{ geo: THREE.BufferGeometry; color?: string; opacity?: number }> = ({
   geo,
-  color = '#7fe6ff',
-  opacity = 0.5,
+  color = '#9ff0ff',
+  opacity = 0.9,
 }) => {
   const edges = useMemo(() => new THREE.EdgesGeometry(geo, 18), [geo]);
   return (
@@ -273,20 +273,20 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
         <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
           color="#0a2733"
-          emissive="#12647d"
-          emissiveIntensity={0.85}
+          emissive="#1789a8"
+          emissiveIntensity={1.4}
           transparent
           opacity={0.92}
           roughness={0.18}
           side={THREE.DoubleSide}
         />
       </mesh>
-      <Wire geo={bell} color="#8ff0ff" opacity={0.5} />
+      <Wire geo={bell} color="#b6f4ff" opacity={1.0} />
       <mesh position={[0, -1.4, 0]} geometry={inner}>
         <sphereGeometry args={[4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
         <meshStandardMaterial color="#08222c" emissive="#0f5c73" emissiveIntensity={0.7} transparent opacity={0.85} />
       </mesh>
-      <Wire geo={inner} color="#66d8f0" opacity={0.35} />
+      <Wire geo={inner} color="#7fe4ff" opacity={0.65} />
       <pointLight position={[0, 6, -12]} color="#7fe5ff" intensity={120} distance={60} decay={2} />
       <pointLight color="#3fc3e0" intensity={16} distance={26} decay={2} />
       {tents.map((a, i) => (
@@ -322,14 +322,14 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
   }, []);
   return (
     <group position={[-8, -128, -2]} rotation={[0, 0.55, 0]}>
-      <Wire geo={body} color="#5fc8e8" opacity={0.45} />
+      <Wire geo={body} color="#7fd8f2" opacity={0.85} />
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
           color="#061a22"
           roughness={0.5}
           metalness={0.2}
-          emissive="#0a2c39"
-          emissiveIntensity={0.35}
+          emissive="#0d3a4a"
+          emissiveIntensity={0.55}
         />
       </mesh>
       {/* 尾鳍 */}
@@ -461,7 +461,7 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
       <directionalLight position={[8, 50, 22]} intensity={0.9} color="#a8dff5" />
       <hemisphereLight args={['#1a5f80', '#010609', 0.7]} />
 
-      <Surface />
+      {t < 6.4 && <Surface />}
       <Boat />
       <Shaft pos={[-9, 2, -26]} h={180} w={11} o={0.30} />
       <Shaft pos={[11, 2, -34]} h={160} w={9} o={0.24} />
