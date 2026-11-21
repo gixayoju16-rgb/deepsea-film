@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from 'react';
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from 'remotion';
 import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
+import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -41,7 +42,7 @@ function camAt(t: number) {
 const Setup: React.FC = () => {
   const { gl, scene } = useThree();
   gl.toneMapping = THREE.ACESFilmicToneMapping;
-  gl.toneMappingExposure = 1.18;
+  gl.toneMappingExposure = 1.4;
   scene.background = new THREE.Color('#02070d');
   return null;
 };
@@ -504,6 +505,10 @@ export const Film3D: React.FC = () => {
           gl={{ antialias: true, alpha: false }}
         >
           <Scene t={t} />
+          <EffectComposer>
+            <Bloom intensity={1.3} luminanceThreshold={0.2} luminanceSmoothing={0.6} mipmapBlur />
+            <Vignette offset={0.3} darkness={0.7} />
+          </EffectComposer>
         </ThreeCanvas>
       </AbsoluteFill>
       <AbsoluteFill
