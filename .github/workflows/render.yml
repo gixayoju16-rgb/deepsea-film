@@ -51,7 +51,7 @@ jobs:
         run: |
           mkdir -p out
           for f in $(echo "${{ github.event.inputs.stills }}" | tr ',' ' '); do
-            npx remotion still src/index.ts DeepSea "out/still-$f.png" --frame=$f --image-format=jpeg
+            npx remotion still src/index.ts DeepSea "out/still-$f.jpg" --frame=$f --image-format=jpeg
           done
           ls -la out/
 
@@ -86,5 +86,5 @@ jobs:
           name: deepsea-film
           path: |
             out/film.mp4
-            out/still-*.png
+            out/still-*.jpg
           retention-days: 30
