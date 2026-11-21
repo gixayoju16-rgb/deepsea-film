@@ -228,7 +228,7 @@ const S4: React.FC = () => {
           stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={340} strokeDashoffset={340 * (1 - appear(lt, 2.4, 0.8))} />
       </svg>
       <div style={{ position: 'absolute', left: colX(9) + 70, top: 280, fontFamily: MONO, fontSize: 24, color: AMBER, opacity: appear(lt, 2.8) }}>carry</div>
-      <div style={{ position: 'absolute', left: 250, top: 760, width: 340, lineHeight: 1.7, fontFamily: MONO, fontSize: 26, color: DIM, opacity: appear(lt, 3.4) }}>
+      <div style={{ position: 'absolute', left: 250, top: 620, width: 360, lineHeight: 1.7, fontFamily: MONO, fontSize: 26, color: DIM, opacity: appear(lt, 3.4) }}>
         13 占两位 →<br />后面每一位都被推右一格
       </div>
     </>
