@@ -14,8 +14,8 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 type Key = { t: number; p: [number, number, number]; l: [number, number, number] };
 
 const KEYS: Key[] = [
-  { t: 0.0, p: [0, 3.0, 15], l: [0, 1.6, 0] },
-  { t: 5.2, p: [0, 2.0, 10], l: [0, 0.6, 0] },
+  { t: 0.0, p: [0, 4.2, 42], l: [0, 2.2, 0] },
+  { t: 5.2, p: [0, 3.0, 26], l: [0, 0.8, 0] },
   { t: 10.0, p: [0, -34, 15], l: [0, -46, 0] },
   { t: 14.6, p: [0, -56, 13], l: [0, -68, 0] },
   { t: 18.2, p: [4, -80, 15], l: [8, -92, -2] },
@@ -94,38 +94,83 @@ const Boat: React.FC = () => {
   );
 };
 
-/* ---------- 光柱 ---------- */
-const Shaft: React.FC<{ pos: [number, number, number]; h?: number; r?: number; o?: number }> = ({
+/* ---------- 光柱（软贴图双面片，避免锥体看成实心筒） ---------- */
+let beamTex: THREE.Texture | null = null;
+const getBeamTex = () => {
+  if (beamTex) return beamTex;
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 256;
+  const g = c.getContext('2d')!;
+  const img = g.createImageData(64, 256);
+  for (let y = 0; y < 256; y++) {
+    for (let x = 0; x < 64; x++) {
+      const u = x / 63;
+      const v = y / 255;
+      const edge = Math.sin(Math.PI * u);
+      const a = Math.pow(edge, 2.0) * Math.pow(1 - v, 1.35) * 255;
+      const i = (y * 64 + x) * 4;
+      img.data[i] = 235;
+      img.data[i + 1] = 250;
+      img.data[i + 2] = 255;
+      img.data[i + 3] = a;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  beamTex = new THREE.CanvasTexture(c);
+  beamTex.needsUpdate = true;
+  return beamTex;
+};
+
+const Shaft: React.FC<{ pos: [number, number, number]; h?: number; w?: number; o?: number }> = ({
   pos,
-  h = 140,
-  r = 12,
-  o = 0.16,
-}) => (
-  <group>
-    <mesh position={[pos[0], pos[1] - h / 2, pos[2]]}>
-      <coneGeometry args={[r, h, 32, 1, true]} />
-      <meshBasicMaterial
-        color="#bdeeff"
-        transparent
-        opacity={o}
-        side={THREE.DoubleSide}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </mesh>
-    <mesh position={[pos[0], pos[1] - h / 2, pos[2]]}>
-      <coneGeometry args={[r * 0.45, h * 0.95, 24, 1, true]} />
-      <meshBasicMaterial
-        color="#e8fbff"
-        transparent
-        opacity={o * 0.9}
-        side={THREE.DoubleSide}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </mesh>
-  </group>
-);
+  h = 150,
+  w = 22,
+  o = 0.85,
+}) => {
+  const tex = useMemo(getBeamTex, []);
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        map: tex,
+        color: '#cdf3ff',
+        transparent: true,
+        opacity: o,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+      }),
+    [tex, o]
+  );
+  return (
+    <group position={[pos[0], pos[1] - h / 2, pos[2]]}>
+      <mesh material={mat}>
+        <planeGeometry args={[w, h]} />
+      </mesh>
+      <mesh material={mat} rotation={[0, Math.PI / 2, 0]}>
+        <planeGeometry args={[w, h]} />
+      </mesh>
+    </group>
+  );
+};
+
+/* ---------- 圆点贴图 ---------- */
+let dotTex: THREE.Texture | null = null;
+const getDotTex = () => {
+  if (dotTex) return dotTex;
+  const c = document.createElement('canvas');
+  c.width = 32;
+  c.height = 32;
+  const g = c.getContext('2d')!;
+  const grd = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+  grd.addColorStop(0, 'rgba(255,255,255,1)');
+  grd.addColorStop(0.4, 'rgba(220,245,255,0.55)');
+  grd.addColorStop(1, 'rgba(200,240,255,0)');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 32, 32);
+  dotTex = new THREE.CanvasTexture(c);
+  return dotTex;
+};
 
 /* ---------- 海雪 ---------- */
 const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 2600 }) => {
@@ -140,14 +185,17 @@ const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 2600 }) => {
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     return g;
   }, [n]);
+  const tex = useMemo(getDotTex, []);
   return (
     <points geometry={geo} rotation={[0, t * 0.015, 0]}>
       <pointsMaterial
+        map={tex}
         color="#d9f6ff"
-        size={0.55}
+        size={1.1}
         sizeAttenuation
         transparent
-        opacity={0.8}
+        opacity={0.55}
+        alphaTest={0.01}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -205,9 +253,9 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
         <meshStandardMaterial
           color="#a7efff"
           emissive="#38b9de"
-          emissiveIntensity={2.2}
+          emissiveIntensity={1.1}
           transparent
-          opacity={0.55}
+          opacity={0.4}
           roughness={0.18}
           side={THREE.DoubleSide}
         />
@@ -216,7 +264,7 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
         <sphereGeometry args={[4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
         <meshStandardMaterial color="#7fe0f8" emissive="#2f9fc4" emissiveIntensity={1.6} transparent opacity={0.4} />
       </mesh>
-      <pointLight color="#6fe0ff" intensity={90} distance={55} decay={2} />
+      <pointLight color="#6fe0ff" intensity={45} distance={50} decay={2} />
       {tents.map((a, i) => (
         <mesh
           key={i}
@@ -280,7 +328,8 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
         <sphereGeometry args={[0.55, 18, 14]} />
         <meshStandardMaterial color="#fbffff" emissive="#b8f8ff" emissiveIntensity={7} />
       </mesh>
-      <pointLight position={[-1.4, 9.2, 0]} color="#b3f6ff" intensity={110} distance={45} decay={2} />
+      <pointLight position={[-1.4, 9.2, 0]} color="#b3f6ff" intensity={70} distance={45} decay={2} />
+      <pointLight position={[2, -3, -10]} color="#2fbfe0" intensity={55} distance={40} decay={2} />
     </group>
   );
 };
@@ -353,7 +402,7 @@ const Rig: React.FC<{ t: number }> = ({ t }) => {
 const Scene: React.FC<{ t: number }> = ({ t }) => {
   const { scene } = useThree();
   useMemo(() => {
-    scene.fog = new THREE.FogExp2(0x03121c, 0.0085);
+    scene.fog = new THREE.FogExp2(0x04141f, 0.019);
   }, [scene]);
   const beamX = useMemo(() => {
     const u = clamp01((t - 25.2) / 5.0);
@@ -370,7 +419,9 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
 
       <Surface />
       <Boat />
-      <Shaft pos={[0, 0, 0]} h={150} r={13} o={0.13} />
+      <Shaft pos={[0, 2, 0]} h={170} w={26} o={0.55} />
+      <Shaft pos={[-6, 2, 6]} h={120} w={12} o={0.35} />
+      <Shaft pos={[7, 2, -4]} h={140} w={16} o={0.3} />
       <Snow t={t} />
       <School t={t} />
       <Jellyfish t={t} />
@@ -380,7 +431,7 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
 
       {t > 24.6 && (
         <group>
-          <Shaft pos={[beamX, -112, -18]} h={95} r={8} o={0.14} />
+          <Shaft pos={[beamX, -110, 0]} h={110} w={16} o={0.55} />
           <pointLight position={[beamX, -150, 6]} color="#cdf3ff" intensity={60} distance={50} decay={2} />
         </group>
       )}
@@ -401,7 +452,7 @@ export const Film3D: React.FC = () => {
         <ThreeCanvas
           width={1920}
           height={1080}
-          camera={{ fov: 50, near: 0.1, far: 500, position: [0, 3, 15] }}
+          camera={{ fov: 50, near: 0.1, far: 500, position: [0, 4, 40] }}
           gl={{ antialias: true, alpha: false }}
         >
           <Scene t={t} />
