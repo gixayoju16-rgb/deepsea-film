@@ -46,6 +46,21 @@ const Setup: React.FC = () => {
   return null;
 };
 
+
+/* ---------- 发光轮廓线（扫描/标本感） ---------- */
+const Wire: React.FC<{ geo: THREE.BufferGeometry; color?: string; opacity?: number }> = ({
+  geo,
+  color = '#7fe6ff',
+  opacity = 0.5,
+}) => {
+  const edges = useMemo(() => new THREE.EdgesGeometry(geo, 18), [geo]);
+  return (
+    <lineSegments geometry={edges}>
+      <lineBasicMaterial color={color} transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} />
+    </lineSegments>
+  );
+};
+
 /* ---------- 海面与天空 ---------- */
 const Surface: React.FC = () => (
   <group>
@@ -250,9 +265,11 @@ const School: React.FC<{ t: number }> = ({ t }) => {
 const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
   const pulse = 1 + Math.sin(t * 3.1) * 0.07;
   const tents = useMemo(() => Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2), []);
+  const bell = useMemo(() => new THREE.SphereGeometry(5.6, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.6), []);
+  const inner = useMemo(() => new THREE.SphereGeometry(4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4), []);
   return (
     <group position={[8, -92 + Math.sin(t * 0.8) * 1.4, -2]} scale={[pulse, 1 / pulse, pulse]}>
-      <mesh>
+      <mesh geometry={bell}>
         <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
           color="#0a2733"
@@ -264,10 +281,12 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh position={[0, -1.4, 0]}>
+      <Wire geo={bell} color="#8ff0ff" opacity={0.5} />
+      <mesh position={[0, -1.4, 0]} geometry={inner}>
         <sphereGeometry args={[4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
         <meshStandardMaterial color="#08222c" emissive="#0f5c73" emissiveIntensity={0.7} transparent opacity={0.85} />
       </mesh>
+      <Wire geo={inner} color="#66d8f0" opacity={0.35} />
       <pointLight position={[0, 6, -12]} color="#7fe5ff" intensity={120} distance={60} decay={2} />
       <pointLight color="#3fc3e0" intensity={16} distance={26} decay={2} />
       {tents.map((a, i) => (
@@ -303,6 +322,7 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
   }, []);
   return (
     <group position={[-8, -128, -2]} rotation={[0, 0.55, 0]}>
+      <Wire geo={body} color="#5fc8e8" opacity={0.45} />
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
           color="#061a22"
@@ -339,12 +359,30 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
+
+const RedWire: React.FC<{ lit: number }> = ({ lit }) => {
+  const geo = useMemo(() => new THREE.SphereGeometry(1, 20, 14), []);
+  const edges = useMemo(() => new THREE.EdgesGeometry(geo, 12), [geo]);
+  return (
+    <lineSegments geometry={edges} scale={[9.05, 4.65, 5.45]}>
+      <lineBasicMaterial
+        color={lit > 0.05 ? '#ff7f92' : '#1d4a5c'}
+        transparent
+        opacity={0.25 + 0.55 * lit}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </lineSegments>
+  );
+};
+
 /* ---------- 红光生物 ---------- */
 const RedCreature: React.FC<{ beamX: number }> = ({ beamX }) => {
   const dist = Math.abs(beamX - 10);
   const lit = clamp01(1 - dist / 13);
   return (
     <group position={[10, -158, -6]} rotation={[0, -0.4, 0]}>
+      <RedWire lit={lit} />
       <mesh scale={[9, 4.6, 5.4]}>
         <sphereGeometry args={[1, 28, 20]} />
         <meshStandardMaterial color="#0a1116" roughness={0.55} metalness={0.15} emissive="#0d1b24" emissiveIntensity={0.3} />
