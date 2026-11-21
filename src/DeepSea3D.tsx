@@ -43,7 +43,19 @@ const Setup: React.FC = () => {
   const { gl, scene } = useThree();
   gl.toneMapping = THREE.ACESFilmicToneMapping;
   gl.toneMappingExposure = 1.4;
-  scene.background = new THREE.Color('#02070d');
+  const c = document.createElement('canvas');
+  c.width = 4;
+  c.height = 256;
+  const g = c.getContext('2d')!;
+  const grd = g.createLinearGradient(0, 0, 0, 256);
+  grd.addColorStop(0, '#0a3550');
+  grd.addColorStop(0.35, '#062435');
+  grd.addColorStop(1, '#01050a');
+  g.fillStyle = grd;
+  g.fillRect(0, 0, 4, 256);
+  const tex = new THREE.CanvasTexture(c);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  scene.background = tex;
   return null;
 };
 
@@ -333,15 +345,15 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
     return new THREE.LatheGeometry(pts, 22);
   }, []);
   return (
-    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]} scale={[1.15, 1.15, 1.15]}>
+    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]} scale={[1.55, 1.55, 1.55]}>
       <Wire geo={body} color="#9ae6ff" opacity={1.0} />
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
           color="#061a22"
           roughness={0.5}
           metalness={0.2}
-          emissive="#0d3a4a"
-          emissiveIntensity={0.55}
+          emissive="#1a5d73"
+          emissiveIntensity={1.1}
         />
       </mesh>
       {/* 尾鳍 */}
@@ -366,7 +378,8 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
         <meshStandardMaterial color="#fbffff" emissive="#b8f8ff" emissiveIntensity={7} />
       </mesh>
       <pointLight position={[-1.4, 9.2, 0]} color="#c8f8ff" intensity={160} distance={55} decay={2} />
-      <pointLight position={[2, 2, -16]} color="#3fd0f0" intensity={130} distance={50} decay={2} />
+      <pointLight position={[2, 2, -16]} color="#3fd0f0" intensity={240} distance={60} decay={2} />
+      <pointLight position={[-2, 6, 8]} color="#bff6ff" intensity={90} distance={34} decay={2} />
       {/* 嘴缝 */}
       <mesh position={[-2.2, -0.4, 2.2]} rotation={[0.1, 0.1, -0.28]}>
         <boxGeometry args={[7.2, 0.16, 0.16]} />
@@ -409,12 +422,12 @@ const RedCreature: React.FC<{ beamX: number; at: [number, number, number] }> = (
         <coneGeometry args={[1.5, 6, 4]} />
         <meshStandardMaterial color="#0a1116" emissive="#5c1420" emissiveIntensity={0.4 * lit} roughness={0.6} />
       </mesh>
-      <mesh scale={[9, 4.6, 5.4]}>
-        <sphereGeometry args={[1, 28, 20]} />
-        <meshStandardMaterial color="#0a1116" roughness={0.55} metalness={0.15} emissive="#0d1b24" emissiveIntensity={0.3} />
+      <mesh scale={[10, 4.2, 4.6]}>
+        <sphereGeometry args={[1, 32, 22]} />
+        <meshStandardMaterial color="#0a1116" roughness={0.55} metalness={0.15} emissive="#0d1b24" emissiveIntensity={0.45} />
       </mesh>
-      <mesh scale={[9.06, 4.66, 5.46]}>
-        <sphereGeometry args={[1, 28, 20]} />
+      <mesh scale={[10.05, 4.25, 4.66]}>
+        <sphereGeometry args={[1, 32, 22]} />
         <meshStandardMaterial
           color="#8e1c2c"
           emissive="#e0354c"
