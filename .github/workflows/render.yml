@@ -5,7 +5,11 @@ on:
   workflow_dispatch:
     inputs:
       frames:
-        description: '可选：只渲前 N 帧做测试（留空=整片）'
+        description: '渲染区间，如 0-320（留空=整片 1116 帧）'
+        required: false
+        default: ''
+      stills:
+        description: '只出静帧用于看画面，逗号分隔帧号，如 30,420,760（填了就不渲染整片）'
         required: false
         default: ''
 
@@ -42,16 +46,27 @@ jobs:
       - name: Ensure Remotion browser
         run: npx remotion browser ensure
 
+      - name: Render stills
+        if: ${{ github.event.inputs.stills != '' }}
+        run: |
+          mkdir -p out
+          for f in $(echo "${{ github.event.inputs.stills }}" | tr ',' ' '); do
+            npx remotion still src/index.ts DeepSea "out/still-$f.png" --frame=$f --image-format=jpeg
+          done
+          ls -la out/
+
       - name: Render (silent)
+        if: ${{ github.event.inputs.stills == '' }}
         run: |
           if [ -n "${{ github.event.inputs.frames }}" ]; then
-            npm run render -- --frames=0-${{ github.event.inputs.frames }}
+            npm run render -- --frames=${{ github.event.inputs.frames }}
           else
             npm run render
           fi
           ls -la out/
 
       - name: Mux narration + burn subtitles
+        if: ${{ github.event.inputs.stills == '' }}
         run: |
           if [ -n "${{ github.event.inputs.frames }}" ]; then
             echo "test run, skip mux"
@@ -69,5 +84,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deepsea-film
-          path: out/film.mp4
+          path: |
+            out/film.mp4
+            out/still-*.png
           retention-days: 30

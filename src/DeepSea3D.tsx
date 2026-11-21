@@ -4,8 +4,6 @@ import { ThreeCanvas } from '@remotion/three';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-/* ---------------- 工具 ---------------- */
-
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (x: number) => {
   const t = clamp01(x);
@@ -16,15 +14,15 @@ const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 type Key = { t: number; p: [number, number, number]; l: [number, number, number] };
 
 const KEYS: Key[] = [
-  { t: 0.0, p: [0, 3.5, 28], l: [0, 2.0, 0] },
-  { t: 5.2, p: [0, 2.2, 17], l: [0, 0.8, 0] },
-  { t: 10.0, p: [0, -38, 14], l: [0, -50, 0] },
-  { t: 14.6, p: [0, -60, 12], l: [0, -72, 0] },
-  { t: 18.2, p: [6, -84, 14], l: [8, -92, -2] },
-  { t: 21.4, p: [-6, -116, 16], l: [-8, -128, -2] },
-  { t: 25.2, p: [0, -142, 18], l: [8, -158, -6] },
-  { t: 30.2, p: [2, -152, 20], l: [10, -172, -6] },
-  { t: 37.2, p: [4, -158, 30], l: [8, -182, -4] },
+  { t: 0.0, p: [0, 3.0, 15], l: [0, 1.6, 0] },
+  { t: 5.2, p: [0, 2.0, 10], l: [0, 0.6, 0] },
+  { t: 10.0, p: [0, -34, 15], l: [0, -46, 0] },
+  { t: 14.6, p: [0, -56, 13], l: [0, -68, 0] },
+  { t: 18.2, p: [4, -80, 15], l: [8, -92, -2] },
+  { t: 21.4, p: [-4, -112, 17], l: [-8, -128, -2] },
+  { t: 25.2, p: [0, -136, 18], l: [8, -158, -6] },
+  { t: 30.2, p: [2, -146, 20], l: [10, -172, -6] },
+  { t: 37.2, p: [4, -152, 30], l: [8, -178, -4] },
 ];
 
 function camAt(t: number) {
@@ -39,91 +37,117 @@ function camAt(t: number) {
   };
 }
 
-/* ---------------- 场景零件 ---------------- */
-
-/** 海面 + 星空 */
-const Surface: React.FC = () => {
-  const ref = useRef<THREE.Mesh>(null);
-  return (
-    <>
-      <mesh ref={ref} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <planeGeometry args={[400, 400, 1, 1]} />
-        <meshStandardMaterial color="#0a2c3f" metalness={0.55} roughness={0.22} />
-      </mesh>
-      {/* 天空辉光 */}
-      <mesh position={[0, -6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[300, 300]} />
-        <meshBasicMaterial color="#0b3c58" transparent opacity={0.5} />
-      </mesh>
-    </>
-  );
+/* ---------- 渲染器设置 ---------- */
+const Setup: React.FC = () => {
+  const { gl, scene } = useThree();
+  gl.toneMapping = THREE.ACESFilmicToneMapping;
+  gl.toneMappingExposure = 1.45;
+  scene.background = new THREE.Color('#02070d');
+  return null;
 };
 
-/** 船 */
-const Boat: React.FC = () => (
-  <group position={[0, 0.6, 0]}>
-    <mesh position={[0, 0.5, 0]}>
-      <boxGeometry args={[9, 1.6, 3]} />
-      <meshStandardMaterial color="#dceaf2" roughness={0.6} />
+/* ---------- 海面与天空 ---------- */
+const Surface: React.FC = () => (
+  <group>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
+      <planeGeometry args={[600, 600]} />
+      <meshStandardMaterial color="#123e58" roughness={0.34} metalness={0.0} />
     </mesh>
-    <mesh position={[0, 5.2, 0]} rotation={[0, 0, 0]}>
-      <coneGeometry args={[2.6, 9, 3]} />
-      <meshStandardMaterial color="#e8f4fa" roughness={0.7} side={THREE.DoubleSide} />
+    {/* 天光带 */}
+    <mesh position={[0, 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <planeGeometry args={[220, 220]} />
+      <meshBasicMaterial color="#2f86ad" transparent opacity={0.35} blending={THREE.AdditiveBlending} depthWrite={false} />
     </mesh>
-    <mesh position={[2.6, 2.4, 0]}>
-      <boxGeometry args={[2.6, 2.2, 2]} />
-      <meshStandardMaterial color="#cfe3ef" roughness={0.6} />
-    </mesh>
-    <pointLight position={[0, -1.2, 0]} color="#a8e8ff" intensity={38} distance={60} decay={2} />
   </group>
 );
 
-/** 光柱（糖圆锥，加法混合） */
+/* ---------- 船 ---------- */
+const Boat: React.FC = () => {
+  const sail = useMemo(() => {
+    const s = new THREE.Shape();
+    s.moveTo(0, 0);
+    s.lineTo(0, 10);
+    s.lineTo(6.2, 0.6);
+    s.lineTo(0, 0);
+    return new THREE.ShapeGeometry(s);
+  }, []);
+  return (
+    <group position={[0, 0.3, 0]}>
+      {/* 船体 */}
+      <mesh position={[0, 0.6, 0]}>
+        <boxGeometry args={[10, 1.5, 3.2]} />
+        <meshStandardMaterial color="#e6f4fb" roughness={0.55} emissive="#7fb7d0" emissiveIntensity={0.18} />
+      </mesh>
+      {/* 桅杆 */}
+      <mesh position={[-0.4, 5.6, 0]}>
+        <cylinderGeometry args={[0.12, 0.12, 10, 8]} />
+        <meshStandardMaterial color="#d8ecf5" />
+      </mesh>
+      {/* 主帆 */}
+      <mesh geometry={sail} position={[-0.3, 0.9, 0.05]}>
+        <meshStandardMaterial color="#f4fbff" emissive="#9fd3e8" emissiveIntensity={0.22} roughness={0.7} side={THREE.DoubleSide} />
+      </mesh>
+      {/* 舷窗光 */}
+      <pointLight position={[0, -1.0, 0]} color="#9fe3ff" intensity={70} distance={80} decay={2} />
+      <pointLight position={[4, 2.2, 0]} color="#8fd4ee" intensity={20} distance={30} decay={2} />
+    </group>
+  );
+};
+
+/* ---------- 光柱 ---------- */
 const Shaft: React.FC<{ pos: [number, number, number]; h?: number; r?: number; o?: number }> = ({
   pos,
-  h = 120,
-  r = 10,
-  o = 0.10,
+  h = 140,
+  r = 12,
+  o = 0.16,
 }) => (
-  <mesh position={[pos[0], pos[1] - h / 2, pos[2]]}>
-    <coneGeometry args={[r, h, 28, 1, true]} />
-    <meshBasicMaterial
-      color="#bdf0ff"
-      transparent
-      opacity={o}
-      side={THREE.DoubleSide}
-      blending={THREE.AdditiveBlending}
-      depthWrite={false}
-    />
-  </mesh>
+  <group>
+    <mesh position={[pos[0], pos[1] - h / 2, pos[2]]}>
+      <coneGeometry args={[r, h, 32, 1, true]} />
+      <meshBasicMaterial
+        color="#bdeeff"
+        transparent
+        opacity={o}
+        side={THREE.DoubleSide}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </mesh>
+    <mesh position={[pos[0], pos[1] - h / 2, pos[2]]}>
+      <coneGeometry args={[r * 0.45, h * 0.95, 24, 1, true]} />
+      <meshBasicMaterial
+        color="#e8fbff"
+        transparent
+        opacity={o * 0.9}
+        side={THREE.DoubleSide}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+      />
+    </mesh>
+  </group>
 );
 
-/** 海雪（悬浮颗粒） */
-const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 3500 }) => {
+/* ---------- 海雪 ---------- */
+const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 2600 }) => {
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     const pos = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 160;
-      pos[i * 3 + 1] = -Math.random() * 230;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 160;
+      pos[i * 3] = (Math.random() - 0.5) * 220;
+      pos[i * 3 + 1] = 10 - Math.random() * 240;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 120;
     }
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
     return g;
   }, [n]);
-  const ref = useRef<THREE.Points>(null);
-  if (ref.current) {
-    ref.current.rotation.y = t * 0.02;
-    ref.current.position.y = Math.sin(t * 0.2) * 0.4;
-  }
   return (
-    <points ref={ref} geometry={geo}>
+    <points geometry={geo} rotation={[0, t * 0.015, 0]}>
       <pointsMaterial
-        color="#cdefff"
-        size={0.42}
+        color="#d9f6ff"
+        size={0.55}
         sizeAttenuation
         transparent
-        opacity={0.55}
+        opacity={0.8}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
       />
@@ -131,16 +155,16 @@ const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 3500 }) => {
   );
 };
 
-/** 鱼群 */
+/* ---------- 鱼群 ---------- */
 const School: React.FC<{ t: number }> = ({ t }) => {
   const items = useMemo(
     () =>
-      Array.from({ length: 70 }, (_, i) => ({
-        y: -72 + (Math.random() - 0.5) * 26,
-        z: (Math.random() - 0.5) * 70,
-        x0: (Math.random() - 0.5) * 140,
-        s: 1.6 + Math.random() * 2.2,
-        sp: 2 + Math.random() * 3,
+      Array.from({ length: 80 }, () => ({
+        y: -72 + (Math.random() - 0.5) * 34,
+        z: (Math.random() - 0.5) * 80,
+        x0: (Math.random() - 0.5) * 160,
+        s: 1.8 + Math.random() * 2.4,
+        sp: 2.5 + Math.random() * 3.5,
         ph: Math.random() * 6.28,
       })),
     []
@@ -148,11 +172,21 @@ const School: React.FC<{ t: number }> = ({ t }) => {
   return (
     <group>
       {items.map((b, i) => {
-        const x = (((b.x0 + t * b.sp) % 180) + 180) % 180 - 90;
+        const x = ((((b.x0 + t * b.sp) % 180) + 180) % 180) - 90;
         return (
-          <mesh key={i} position={[x, b.y + Math.sin(t * 0.6 + b.ph) * 1.4, b.z]} scale={[b.s, b.s * 0.42, b.s * 0.22]}>
-            <sphereGeometry args={[1, 12, 8]} />
-            <meshStandardMaterial color="#04121a" roughness={0.9} metalness={0.1} />
+          <mesh
+            key={i}
+            position={[x, b.y + Math.sin(t * 0.6 + b.ph) * 1.6, b.z]}
+            scale={[b.s, b.s * 0.4, b.s * 0.24]}
+          >
+            <sphereGeometry args={[1, 14, 10]} />
+            <meshStandardMaterial
+              color="#123a4d"
+              roughness={0.55}
+              metalness={0.15}
+              emissive="#1d5a75"
+              emissiveIntensity={0.35}
+            />
           </mesh>
         );
       })}
@@ -160,183 +194,194 @@ const School: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
-/** 水母 */
+/* ---------- 水母 ---------- */
 const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
-  const g = useRef<THREE.Group>(null);
-  const pulse = 1 + Math.sin(t * 3.1) * 0.06;
-  if (g.current) {
-    g.current.position.y = -92 + Math.sin(t * 0.8) * 1.6;
-    g.current.scale.setScalar(pulse);
-  }
-  const tents = useMemo(() => Array.from({ length: 10 }, (_, i) => (i / 10) * Math.PI * 2), []);
+  const pulse = 1 + Math.sin(t * 3.1) * 0.07;
+  const tents = useMemo(() => Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2), []);
   return (
-    <group ref={g} position={[8, -92, -2]}>
+    <group position={[8, -92 + Math.sin(t * 0.8) * 1.4, -2]} scale={[pulse, 1 / pulse, pulse]}>
       <mesh>
-        <sphereGeometry args={[5.4, 32, 24, 0, Math.PI * 2, 0, Math.PI * 0.62]} />
+        <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
-          color="#8fe8ff"
-          emissive="#4fd1e8"
-          emissiveIntensity={1.4}
+          color="#a7efff"
+          emissive="#38b9de"
+          emissiveIntensity={2.2}
           transparent
-          opacity={0.45}
-          roughness={0.25}
+          opacity={0.55}
+          roughness={0.18}
           side={THREE.DoubleSide}
         />
       </mesh>
-      <pointLight color="#6fe0ff" intensity={26} distance={40} decay={2} />
-      {tents.map((a, i) => {
-        const r = 3.4;
-        return (
-          <mesh key={i} position={[Math.cos(a) * r, -6 + Math.sin(t * 1.6 + i) * 0.8, Math.sin(a) * r]} rotation={[0.2, a, 0.1]}>
-            <cylinderGeometry args={[0.06, 0.03, 12, 5]} />
-            <meshStandardMaterial color="#9fe9ff" emissive="#5fd0ea" emissiveIntensity={0.9} transparent opacity={0.55} />
-          </mesh>
-        );
-      })}
+      <mesh position={[0, -1.4, 0]}>
+        <sphereGeometry args={[4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
+        <meshStandardMaterial color="#7fe0f8" emissive="#2f9fc4" emissiveIntensity={1.6} transparent opacity={0.4} />
+      </mesh>
+      <pointLight color="#6fe0ff" intensity={90} distance={55} decay={2} />
+      {tents.map((a, i) => (
+        <mesh
+          key={i}
+          position={[Math.cos(a) * 3.6, -7 + Math.sin(t * 1.6 + i) * 0.9, Math.sin(a) * 3.6]}
+          rotation={[0.15, a, 0.12]}
+        >
+          <cylinderGeometry args={[0.07, 0.02, 14, 5]} />
+          <meshStandardMaterial
+            color="#bdf1ff"
+            emissive="#5fd0ea"
+            emissiveIntensity={1.4}
+            transparent
+            opacity={0.6}
+          />
+        </mesh>
+      ))}
     </group>
   );
 };
 
-/** 鮟鱇 */
+/* ---------- 鮟鱇 ---------- */
 const Angler: React.FC<{ t: number }> = ({ t }) => {
   const body = useMemo(() => {
     const pts: THREE.Vector2[] = [];
-    for (let i = 0; i <= 14; i++) {
-      const u = i / 14;
-      const r = 0.6 + Math.sin(u * Math.PI) * 4.6;
-      pts.push(new THREE.Vector2(r, (u - 0.5) * 15));
+    for (let i = 0; i <= 16; i++) {
+      const u = i / 16;
+      const r = 0.5 + Math.sin(u * Math.PI) * 5.0;
+      pts.push(new THREE.Vector2(r, (u - 0.5) * 16));
     }
-    return new THREE.LatheGeometry(pts, 20);
+    return new THREE.LatheGeometry(pts, 22);
   }, []);
-  const lureY = -128 + Math.sin(t * 1.4) * 0.7;
   return (
-    <group position={[-8, -128, -2]} rotation={[0, 0.5, 0]}>
-      <mesh geometry={body} scale={[1, 1, 0.75]} rotation={[0, 0, Math.PI / 2]}>
-        <meshStandardMaterial color="#0d2029" roughness={0.75} metalness={0.25} />
+    <group position={[-8, -128, -2]} rotation={[0, 0.55, 0]}>
+      <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
+        <meshStandardMaterial
+          color="#20434f"
+          roughness={0.55}
+          metalness={0.25}
+          emissive="#123340"
+          emissiveIntensity={0.35}
+        />
+      </mesh>
+      {/* 尾鳍 */}
+      <mesh position={[7, 0, 0]} scale={[1, 1.6, 0.2]}>
+        <coneGeometry args={[2.2, 4.5, 4]} />
+        <meshStandardMaterial color="#1b3b46" roughness={0.7} emissive="#0e2733" emissiveIntensity={0.3} />
       </mesh>
       {/* 牙 */}
-      {Array.from({ length: 9 }).map((_, i) => (
-        <mesh key={i} position={[-4 + i * 1.05, 2.4 - i * 0.12, 1.2]} rotation={[0, 0, 0.25]}>
-          <coneGeometry args={[0.13, 1.1, 5]} />
-          <meshStandardMaterial color="#cfe9f5" emissive="#4a8ba8" emissiveIntensity={0.4} />
+      {Array.from({ length: 10 }).map((_, i) => (
+        <mesh key={i} position={[-4.6 + i * 1.02, 2.6 - i * 0.14, 1.3]} rotation={[0, 0, 0.22]}>
+          <coneGeometry args={[0.14, 1.2, 5]} />
+          <meshStandardMaterial color="#e8f7ff" emissive="#7fc4dd" emissiveIntensity={0.8} />
         </mesh>
       ))}
       {/* 诱饵杆 */}
-      <mesh position={[-3.6, 6.2, 0]} rotation={[0, 0, -0.5]}>
-        <cylinderGeometry args={[0.08, 0.08, 6, 6]} />
-        <meshStandardMaterial color="#16323f" />
+      <mesh position={[-4.2, 6.6, 0]} rotation={[0, 0, -0.55]}>
+        <cylinderGeometry args={[0.09, 0.09, 7, 6]} />
+        <meshStandardMaterial color="#1c3945" emissive="#0d2029" emissiveIntensity={0.2} />
       </mesh>
-      <mesh position={[-1.2, lureY + 131.6, 0]}>
-        <sphereGeometry args={[0.5, 16, 12]} />
-        <meshStandardMaterial color="#eafeff" emissive="#9ff2ff" emissiveIntensity={5} />
+      <mesh position={[-1.4, 9.4 + Math.sin(t * 1.4) * 0.35, 0]}>
+        <sphereGeometry args={[0.55, 18, 14]} />
+        <meshStandardMaterial color="#fbffff" emissive="#b8f8ff" emissiveIntensity={7} />
       </mesh>
-      <pointLight position={[-1.2, 4.6, 0]} color="#a8f4ff" intensity={30} distance={34} decay={2} />
+      <pointLight position={[-1.4, 9.2, 0]} color="#b3f6ff" intensity={110} distance={45} decay={2} />
     </group>
   );
 };
 
-/** 被光扫到才显出红色的生物 */
-const RedCreature: React.FC<{ t: number; beamX: number }> = ({ t, beamX }) => {
+/* ---------- 红光生物 ---------- */
+const RedCreature: React.FC<{ beamX: number }> = ({ beamX }) => {
   const dist = Math.abs(beamX - 10);
-  const lit = clamp01(1 - dist / 14);
+  const lit = clamp01(1 - dist / 13);
   return (
     <group position={[10, -158, -6]} rotation={[0, -0.4, 0]}>
-      <mesh scale={[8, 4.2, 5]}>
-        <sphereGeometry args={[1, 24, 18]} />
-        <meshStandardMaterial color="#0a151c" roughness={0.85} metalness={0.2} />
+      <mesh scale={[9, 4.6, 5.4]}>
+        <sphereGeometry args={[1, 28, 20]} />
+        <meshStandardMaterial color="#1a2b33" roughness={0.6} metalness={0.2} emissive="#0d1b22" emissiveIntensity={0.3} />
       </mesh>
-      <mesh scale={[8.05, 4.25, 5.05]}>
-        <sphereGeometry args={[1, 24, 18]} />
+      <mesh scale={[9.06, 4.66, 5.46]}>
+        <sphereGeometry args={[1, 28, 20]} />
         <meshStandardMaterial
-          color="#c8384f"
-          emissive="#e0425c"
-          emissiveIntensity={1.6}
+          color="#e0455e"
+          emissive="#ff5a70"
+          emissiveIntensity={2.4}
           transparent
-          opacity={0.92 * lit}
-          roughness={0.5}
+          opacity={0.9 * lit}
+          roughness={0.45}
         />
       </mesh>
     </group>
   );
 };
 
-/** 海底 */
+/* ---------- 海底 ---------- */
 const Floor: React.FC = () => {
   const rocks = useMemo(
     () =>
-      Array.from({ length: 26 }, () => ({
-        x: (Math.random() - 0.5) * 180,
-        z: (Math.random() - 0.5) * 180,
-        s: 1 + Math.random() * 6,
+      Array.from({ length: 30 }, () => ({
+        x: (Math.random() - 0.5) * 200,
+        z: (Math.random() - 0.5) * 200,
+        s: 1 + Math.random() * 7,
       })),
     []
   );
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -186, 0]}>
-        <planeGeometry args={[400, 400, 40, 40]} />
-        <meshStandardMaterial color="#050e15" roughness={0.95} metalness={0.05} />
+        <planeGeometry args={[500, 500]} />
+        <meshStandardMaterial color="#0b1d27" roughness={0.92} metalness={0.05} emissive="#071319" emissiveIntensity={0.4} />
       </mesh>
       {rocks.map((r, i) => (
-        <mesh key={i} position={[r.x, -186 + r.s * 0.4, r.z]} scale={[r.s, r.s * 0.6, r.s]}>
+        <mesh key={i} position={[r.x, -186 + r.s * 0.35, r.z]} scale={[r.s, r.s * 0.55, r.s]}>
           <icosahedronGeometry args={[1, 0]} />
-          <meshStandardMaterial color="#08141c" roughness={0.9} />
+          <meshStandardMaterial color="#10242e" roughness={0.85} emissive="#08161d" emissiveIntensity={0.35} />
         </mesh>
       ))}
     </group>
   );
 };
 
-/** 相机 */
+/* ---------- 相机 ---------- */
 const Rig: React.FC<{ t: number }> = ({ t }) => {
   const { camera } = useThree();
   const c = camAt(t);
-  const shake = 0.08;
   camera.position.set(
-    c.p[0] + Math.sin(t * 1.7) * shake,
-    c.p[1] + Math.cos(t * 1.3) * shake,
+    c.p[0] + Math.sin(t * 1.7) * 0.06,
+    c.p[1] + Math.cos(t * 1.3) * 0.06,
     c.p[2]
   );
   camera.lookAt(c.l[0], c.l[1], c.l[2]);
-  camera.updateProjectionMatrix();
   return null;
 };
 
-/* ---------------- 场景 ---------------- */
-
-const Scene: React.FC<{ t: number; frame: number }> = ({ t }) => {
+const Scene: React.FC<{ t: number }> = ({ t }) => {
   const { scene } = useThree();
-  scene.fog = useMemo(() => new THREE.FogExp2(0x02060b, 0.011), []);
-  // 光束位置：S7 扫过
+  useMemo(() => {
+    scene.fog = new THREE.FogExp2(0x03121c, 0.0085);
+  }, [scene]);
   const beamX = useMemo(() => {
-    const a = 25.2, b = 30.2;
-    const u = clamp01((t - a) / (b - a));
-    return -24 + u * 62;
+    const u = clamp01((t - 25.2) / 5.0);
+    return -26 + u * 64;
   }, [t]);
 
   return (
     <>
+      <Setup />
       <Rig t={t} />
-      <ambientLight intensity={0.22} color="#2a5f7d" />
-      <directionalLight position={[6, 40, 18]} intensity={0.55} color="#8fd0ea" />
-      <hemisphereLight args={['#0d3550', '#01060b', 0.5]} />
+      <ambientLight intensity={0.55} color="#2f6f8f" />
+      <directionalLight position={[8, 50, 22]} intensity={0.9} color="#a8dff5" />
+      <hemisphereLight args={['#1a5f80', '#010609', 0.7]} />
 
       <Surface />
       <Boat />
-      <Shaft pos={[0, 0, 0]} h={130} r={11} o={0.09} />
-      <Shaft pos={[0, -20, 0]} h={90} r={16} o={0.05} />
+      <Shaft pos={[0, 0, 0]} h={150} r={13} o={0.13} />
       <Snow t={t} />
       <School t={t} />
       <Jellyfish t={t} />
       <Angler t={t} />
-      <RedCreature t={t} beamX={beamX} />
+      <RedCreature beamX={beamX} />
       <Floor />
 
-      {/* S7 探照灯 */}
       {t > 24.6 && (
         <group>
-          <Shaft pos={[beamX, -110, -20]} h={90} r={7} o={0.12} />
-          <pointLight position={[beamX, -150, 6]} color="#bfefff" intensity={22} distance={40} decay={2} />
+          <Shaft pos={[beamX, -112, -18]} h={95} r={8} o={0.14} />
+          <pointLight position={[beamX, -150, 6]} color="#cdf3ff" intensity={60} distance={50} decay={2} />
         </group>
       )}
     </>
@@ -347,27 +392,25 @@ export const Film3D: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
   const t = frame / fps;
-  const fadeIn = smooth(frame / 14);
+  const fadeIn = smooth(frame / 12);
   const fadeOut = smooth((durationInFrames - frame) / 12);
 
   return (
-    <AbsoluteFill style={{ background: '#02050a' }}>
+    <AbsoluteFill style={{ background: '#02070d' }}>
       <AbsoluteFill style={{ opacity: Math.min(fadeIn, fadeOut) }}>
         <ThreeCanvas
           width={1920}
           height={1080}
-          camera={{ fov: 52, near: 0.1, far: 600, position: [0, 3, 30] }}
+          camera={{ fov: 50, near: 0.1, far: 500, position: [0, 3, 15] }}
           gl={{ antialias: true, alpha: false }}
-          style={{ background: '#02050a' }}
         >
-          <Scene t={t} frame={frame} />
+          <Scene t={t} />
         </ThreeCanvas>
       </AbsoluteFill>
-      {/* 暗角 + 颗粒（DOM 层，便宜） */}
       <AbsoluteFill
         style={{
           background:
-            'radial-gradient(70% 62% at 50% 46%, rgba(0,0,0,0) 36%, rgba(0,0,0,.55) 82%, rgba(0,0,0,.9) 100%)',
+            'radial-gradient(72% 64% at 50% 46%, rgba(0,0,0,0) 40%, rgba(0,0,0,.45) 84%, rgba(0,0,0,.82) 100%)',
         }}
       />
     </AbsoluteFill>
