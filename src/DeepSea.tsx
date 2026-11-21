@@ -211,8 +211,8 @@ const S3: React.FC<{ f: number; d: number }> = ({ f }) => {
   const sway2 = Math.sin(f * 0.028 + 1.1) * 34;
   return (
     <AbsoluteFill style={{ background: 'radial-gradient(120% 90% at 70% 0%, #061521 0%, #03070C 55%, #010305 100%)' }}>
-      <Shaft left={1010 + sway} top={-80} w={820} h={1300} opacity={0.36} blur={18} />
-      <Shaft left={760 + sway2} top={-40} w={420} h={900} angle={4} opacity={0.14} blur={26} core={false} />
+      <Shaft left={1010 + sway} top={-80} w={820} h={1300} opacity={0.55} blur={18} />
+      <Shaft left={760 + sway2} top={-40} w={420} h={900} angle={4} opacity={0.22} blur={26} core={false} />
       <div style={{ position: 'absolute', left: 1330 + sway, top: -26, width: 96, height: 26, borderRadius: 9, background: 'rgba(210,240,255,.86)', filter: 'blur(3px)' }} />
       <DepthParticles f={f} n={110} seed={9} boost={1.15} />
       <AbsoluteFill style={{ background: 'radial-gradient(70% 60% at 50% 45%, rgba(0,0,0,0) 26%, rgba(0,0,0,.8) 100%)' }} />
@@ -278,8 +278,8 @@ const S5: React.FC<{ f: number; d: number }> = ({ f, d }) => {
         <svg width="520" height="640" viewBox="0 0 520 640">
           <defs>
             <radialGradient id="bell" cx="50%" cy="24%" r="76%">
-              <stop offset="0%" stopColor="rgba(238,255,255,.70)" />
-              <stop offset="40%" stopColor="rgba(118,218,244,.42)" />
+              <stop offset="0%" stopColor="rgba(245,255,255,.86)" />
+              <stop offset="40%" stopColor="rgba(140,230,250,.58)" />
               <stop offset="100%" stopColor="rgba(30,105,155,.10)" />
             </radialGradient>
             <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
@@ -319,17 +319,17 @@ const S6: React.FC<{ f: number; d: number }> = ({ f }) => {
       <svg width="1920" height="1080" style={{ position: 'absolute', left: 0, top: 0, opacity: reveal }}>
         <defs>
           <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#0C1E29" />
-            <stop offset="60%" stopColor="#05101A" />
+            <stop offset="0%" stopColor="#14303D" />
+            <stop offset="60%" stopColor="#08171F" />
             <stop offset="100%" stopColor="#01050A" />
           </linearGradient>
           <radialGradient id="lit" cx="50%" cy="0%" r="70%">
-            <stop offset="0%" stopColor="rgba(190,245,255,.35)" />
+            <stop offset="0%" stopColor="rgba(200,248,255,.55)" />
             <stop offset="60%" stopColor="rgba(60,150,200,.06)" />
             <stop offset="100%" stopColor="rgba(0,0,0,0)" />
           </radialGradient>
         </defs>
-        <path d="M 600 700 C 600 470, 860 420, 1110 442 C 1250 454, 1322 506, 1386 548 L 1548 610 L 1386 684 C 1340 800, 1170 918, 950 916 C 730 914, 590 830, 600 700 Z" fill="url(#body)" stroke="rgba(105,185,225,.42)" strokeWidth="2" />
+        <path d="M 600 700 C 600 470, 860 420, 1110 442 C 1250 454, 1322 506, 1386 548 L 1548 610 L 1386 684 C 1340 800, 1170 918, 950 916 C 730 914, 590 830, 600 700 Z" fill="url(#body)" stroke="rgba(140,205,240,.62)" strokeWidth="3" />
         <path d="M 600 700 C 600 470, 860 420, 1110 442 C 1250 454, 1322 506, 1386 548 L 1548 610 L 1386 684 C 1340 800, 1170 918, 950 916 C 730 914, 590 830, 600 700 Z" fill="url(#lit)" />
         <path d="M 1386 548 C 1310 588, 1310 656, 1386 684" stroke="rgba(150,220,250,.34)" strokeWidth="3" fill="none" />
         {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
@@ -378,7 +378,7 @@ const S7: React.FC<{ f: number; d: number }> = ({ f, d }) => {
           <path d={body} fill="none" stroke="rgba(255,214,220,.55)" strokeWidth="2.5" />
         </g>
         <g filter="url(#soft)">
-          <polygon points={`${beamX - 70},0 ${beamX + 130},0 ${beamX + 420},1080 ${beamX + 200},1080`} fill="url(#beamGrad)" opacity="0.6" />
+          <polygon points={`${beamX - 70},0 ${beamX + 130},0 ${beamX + 420},1080 ${beamX + 200},1080`} fill="url(#beamGrad)" opacity="0.8" />
           <polygon points={`${beamX - 34},0 ${beamX + 96},0 ${beamX + 356},1080 ${beamX + 236},1080`} fill="url(#beamGrad)" opacity="0.55" />
         </g>
       </svg>
@@ -442,10 +442,10 @@ export const Film: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: '#03060B' }}>
-      <AbsoluteFill style={{ opacity: Math.min(1, fadeIn * fadeOut), transform: breathe }}>
+      <AbsoluteFill style={{ opacity: Math.min(1, fadeIn * fadeOut), transform: breathe, filter: 'brightness(1.22) contrast(1.05) saturate(1.05)' }}>
         <Comp f={local} d={d} />
         <Grade />
-        <Vignette strength={0.36} />
+        <Vignette strength={0.24} />
         <Grain opacity={0.055} seed={idx * 13} />
       </AbsoluteFill>
       {/* 全片最后 40 帧压暗收尾 */}
