@@ -58,16 +58,16 @@ const pop = (lt: number, at: number, fps = 30) => spring({ frame: (lt - at) * fp
 const S1: React.FC = () => {
   const lt = useLocal(0);
   const { fps } = useVideoConfig();
-  const startX = 360;
-  const cell = 52;
+  const startX = 300;
+  const cell = 62;
   const baseY = 470;
   return (
     <>
       <Label x={360} y={330} text="a fraction" />
-      <div style={{ position: 'absolute', left: startX, top: 356, fontFamily: MONO, fontSize: 62, color: INK, opacity: appear(lt, 0.05) }}>
+      <div style={{ position: 'absolute', left: startX, top: 356, fontFamily: MONO, fontSize: 76, color: INK, opacity: appear(lt, 0.05) }}>
         1 / 89
       </div>
-      <div style={{ position: 'absolute', left: startX, top: baseY + 120, fontFamily: MONO, fontSize: 34, color: DIM, opacity: appear(lt, 1.0) }}>
+      <div style={{ position: 'absolute', left: startX, top: baseY + 150, fontFamily: MONO, fontSize: 38, color: DIM, opacity: appear(lt, 1.0) }}>
         1 ÷ 89 = 0.
       </div>
       {DIGITS.slice(0, 26).map((d, i) => {
@@ -79,15 +79,15 @@ const S1: React.FC = () => {
         return (
           <div key={i} style={{
             position: 'absolute',
-            left: startX + 175 + i * cell,
+            left: startX + 200 + i * cell,
             top: baseY + 105 - (1 - o) * 14,
-            fontFamily: MONO, fontSize: 62, color: col, opacity: o,
+            fontFamily: MONO, fontSize: 72, color: col, opacity: o,
           }}>{d}</div>
         );
       })}
-      <div style={{ position: 'absolute', left: startX + 175, top: baseY + 186, width: 6 * cell + cell * 0.42, height: 2, background: CYAN, opacity: appear(lt, 1.9) * 0.6 }} />
-      <div style={{ position: 'absolute', left: startX + 175 + 6 * cell, top: baseY + 186, width: cell * 0.42, height: 2, background: AMBER, opacity: appear(lt, 1.9) * 0.6 }} />
-      <div style={{ position: 'absolute', left: startX + 175, top: baseY + 210, fontFamily: MONO, fontSize: 20, color: DIM, opacity: appear(lt, 2.0) }}>
+      <div style={{ position: 'absolute', left: startX + 200, top: baseY + 196, width: 6 * cell + cell * 0.42, height: 2, background: CYAN, opacity: appear(lt, 1.9) * 0.6 }} />
+      <div style={{ position: 'absolute', left: startX + 200 + 6 * cell, top: baseY + 196, width: cell * 0.42, height: 2, background: AMBER, opacity: appear(lt, 1.9) * 0.6 }} />
+      <div style={{ position: 'absolute', left: startX + 200, top: baseY + 224, fontFamily: MONO, fontSize: 22, color: DIM, opacity: appear(lt, 2.0) }}>
         <span style={{ color: CYAN }}>fibonacci</span> · <span style={{ color: AMBER }}>and then?</span>
       </div>
     </>
@@ -128,7 +128,7 @@ const S2: React.FC = () => {
         const o = appear(lt, 0.1, 0.3);
         return (
           <div key={i} style={{
-            position: 'absolute', left: startX + 175 + i * cell, top: baseY + 105,
+            position: 'absolute', left: startX + 200 + i * cell, top: baseY + 105,
             fontFamily: MONO, fontSize: 62,
             color: i < 6 ? CYAN : i === 6 ? AMBER : INK, opacity: o,
           }}>{d}</div>
@@ -145,45 +145,52 @@ const S2: React.FC = () => {
 };
 
 /* ---------------- S3：竖式相加 ---------------- */
-const ADD = [
-  { f: '1', k: 1 }, { f: '1', k: 2 }, { f: '2', k: 3 }, { f: '3', k: 4 },
-  { f: '5', k: 5 }, { f: '8', k: 6 }, { f: '13', k: 7 }, { f: '21', k: 8 }, { f: '34', k: 9 },
+const ADD_TERMS: [string, number][] = [
+  ['1', 1], ['1', 2], ['2', 3], ['3', 4], ['5', 5], ['8', 6], ['13', 7], ['21', 8], ['34', 9],
 ];
+const GRID_X = 700;
+const GRID_CELL = 58;
+const colX = (col: number) => GRID_X + (col - 1) * GRID_CELL;
+
+const Addend: React.FC<{ f: string; k: number; y: number; o: number; big?: boolean }> = ({ f, k, y, o, big }) => (
+  <>
+    <div style={{ position: 'absolute', left: GRID_X - 96, top: y, width: 50, textAlign: 'right', fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>+</div>
+    <div style={{ position: 'absolute', left: GRID_X - 66, top: y, fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>0.</div>
+    {f.split('').map((d, j) => {
+      const col = k + 1 - (f.length - 1 - j);
+      return (
+        <div key={j} style={{
+          position: 'absolute', left: colX(col), top: y - (big ? 4 : 0),
+          fontFamily: MONO, fontSize: big ? 52 : 46, color: k >= 7 ? AMBER : INK, opacity: o,
+        }}>{d}</div>
+      );
+    })}
+  </>
+);
+
 const S3: React.FC = () => {
   const lt = useLocal(2);
-  const x0 = 620;
-  const cell = 46;
   const y0 = 250;
   return (
     <>
-      <Label x={280} y={180} text="sum them, one digit per row" />
-      <div style={{ position: 'absolute', left: 280, top: 210, fontFamily: MONO, fontSize: 34, color: INK, opacity: appear(lt, 0.1) }}>1/89 =</div>
-      {ADD.map((row, i) => {
-        const at = 0.5 + i * 0.42;
-        const o = appear(lt, at, 0.3);
-        const drop = (1 - o) * -26;
-        const startCol = row.k + 1 - row.f.length + 1;
-        return (
-          <div key={i} style={{ position: 'absolute', top: y0 + i * 54 + drop, opacity: o, display: 'flex', alignItems: 'baseline' }}>
-            <div style={{ position: 'absolute', left: x0 - 70, width: 40, textAlign: 'right', fontFamily: MONO, fontSize: 34, color: DIM }}>{i === 0 ? '' : '+'}</div>
-            <div style={{ position: 'absolute', left: x0 + 2 * cell, fontFamily: MONO, fontSize: 34, color: DIM }}>0.</div>
-            {row.f.split('').map((d, j) => (
-              <div key={j} style={{
-                position: 'absolute',
-                left: x0 + (startCol + j - 1) * cell,
-                fontFamily: MONO, fontSize: 44,
-                color: row.k >= 7 ? AMBER : INK,
-              }}>{d}</div>
-            ))}
-          </div>
-        );
+      <Label x={300} y={150} text="sum them · one digit per row" />
+      <div style={{ position: 'absolute', left: 300, top: 190, fontFamily: MONO, fontSize: 46, color: INK, opacity: appear(lt, 0.05) }}>
+        <span style={{ color: DIM }}>1/89 = </span>0.011235955…
+      </div>
+      {ADD_TERMS.map(([f, k], i) => {
+        const o = appear(lt, 0.5 + i * 0.42, 0.3);
+        const shift = (1 - o) * -30;
+        return <Addend key={i} f={f} k={k} y={y0 + i * 62 + shift} o={o} />;
       })}
-      <div style={{ position: 'absolute', left: x0, top: y0 + ADD.length * 54 + 6, width: 12 * cell, height: 2, background: DIM, opacity: appear(lt, 4.6) }} />
-      <div style={{ position: 'absolute', left: x0, top: y0 + ADD.length * 54 + 34, fontFamily: MONO, fontSize: 46, color: INK, opacity: appear(lt, 5.0) }}>
+      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 62 + 8, width: 11 * GRID_CELL, height: 2, background: DIM, opacity: appear(lt, 4.8) }} />
+      <div style={{ position: 'absolute', left: GRID_X - 66, top: y0 + ADD_TERMS.length * 62 + 30, fontFamily: MONO, fontSize: 50, opacity: appear(lt, 5.1) }}>
         <span style={{ color: DIM }}>0.</span>
         <span style={{ color: CYAN }}>011235</span>
         <span style={{ color: AMBER }}>9</span>
         <span style={{ color: DIM }}>…</span>
+      </div>
+      <div style={{ position: 'absolute', left: 300, top: y0 + ADD_TERMS.length * 62 + 40, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 5.6) }}>
+        每一行都比上一行小十倍 → 斜着排下来
       </div>
     </>
   );
@@ -192,48 +199,30 @@ const S3: React.FC = () => {
 /* ---------------- S4：进位 ---------------- */
 const S4: React.FC = () => {
   const lt = useLocal(3);
-  const x0 = 620;
-  const cell = 46;
-  const y0 = 250;
-  const rows = [
-    { f: '5', k: 5 }, { f: '8', k: 6 }, { f: '13', k: 7 }, { f: '21', k: 8 }, { f: '34', k: 9 },
-  ];
+  const y0 = 340;
+  const rows: [string, number][] = [['5', 5], ['8', 6], ['13', 7], ['21', 8], ['34', 9]];
   return (
     <>
-      <Label x={280} y={170} text="carry" />
-      {rows.map((row, i) => {
-        const o = appear(lt, 0.1 + i * 0.16, 0.3);
-        const startCol = row.k + 1 - row.f.length + 1;
-        const push = row.k >= 7 ? appear(lt, 1.2) * 8 : 0;
-        return (
-          <div key={i} style={{ position: 'absolute', top: y0 + i * 74, opacity: o }}>
-            <div style={{ position: 'absolute', left: x0 - 70, width: 40, textAlign: 'right', fontFamily: MONO, fontSize: 34, color: DIM }}>{i === 0 ? '' : '+'}</div>
-            <div style={{ position: 'absolute', left: x0 + 2 * cell, fontFamily: MONO, fontSize: 34, color: DIM }}>0.</div>
-            {row.f.split('').map((d, j) => (
-              <div key={j} style={{
-                position: 'absolute',
-                left: x0 + (startCol + j - 1) * cell + push * (j + 1),
-                fontFamily: MONO, fontSize: 48,
-                color: row.k >= 7 ? AMBER : INK,
-              }}>{d}</div>
-            ))}
-          </div>
-        );
-      })}
-      <svg width={1920} height={1080} style={{ position: 'absolute' }}>
-        <path d={`M ${x0 + 7 * cell + 10} ${y0 + 2 * 74 + 54} C ${x0 + 8 * cell} ${y0 + 2 * 74 + 20}, ${x0 + 8 * cell} ${y0 - 20}, ${x0 + 7 * cell + 4} ${y0 - 44}`}
-          stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={220} strokeDashoffset={220 * (1 - appear(lt, 2.0, 0.7))} />
-        <path d={`M ${x0 + 8 * cell + 10} ${y0 + 2 * 74 + 54} C ${x0 + 9 * cell} ${y0 + 2 * 74 + 10}, ${x0 + 10 * cell} ${y0 - 30}, ${x0 + 8 * cell + 4} ${y0 - 44}`}
-          stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={260} strokeDashoffset={260 * (1 - appear(lt, 2.3, 0.7))} />
-      </svg>
-      <div style={{ position: 'absolute', left: x0, top: y0 - 96, fontFamily: MONO, fontSize: 46, color: INK, opacity: appear(lt, 0.05) }}>
+      <Label x={300} y={150} text="carry · the pattern breaks" />
+      <div style={{ position: 'absolute', left: GRID_X - 66, top: 220, fontFamily: MONO, fontSize: 52, color: INK, opacity: appear(lt, 0.05) }}>
         <span style={{ color: DIM }}>0.</span>
         <span style={{ color: CYAN }}>011235</span>
         <span style={{ color: AMBER }}>9</span>
         <span style={{ color: INK }}>5</span>
       </div>
-      <div style={{ position: 'absolute', left: x0, top: y0 + 5 * 74 + 60, fontFamily: MONO, fontSize: 28, color: DIM, opacity: appear(lt, 3.0) }}>
-        13 占两位 → 后面每一位都被推右一格
+      {rows.map(([f, k], i) => {
+        const o = appear(lt, 0.15 + i * 0.16, 0.3);
+        return <Addend key={i} f={f} k={k} y={y0 + i * 88} o={o} big={k === 7} />;
+      })}
+      <svg width={1920} height={1080} style={{ position: 'absolute' }}>
+        <path d={`M ${colX(8) + 14} ${y0 + 2 * 88 + 40} C ${colX(9) + 40} ${y0 + 2 * 88}, ${colX(9) + 30} 300, ${colX(8) + 10} 282`}
+          stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={300} strokeDashoffset={300 * (1 - appear(lt, 2.0, 0.8))} />
+        <path d={`M ${colX(9) + 26} ${y0 + 2 * 88 + 40} C ${colX(10) + 60} ${y0 + 2 * 88 - 20}, ${colX(10) + 40} 320, ${colX(9) + 20} 282`}
+          stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={340} strokeDashoffset={340 * (1 - appear(lt, 2.4, 0.8))} />
+      </svg>
+      <div style={{ position: 'absolute', left: colX(9) + 70, top: 300, fontFamily: MONO, fontSize: 24, color: AMBER, opacity: appear(lt, 2.8) }}>carry</div>
+      <div style={{ position: 'absolute', left: 300, top: y0 + 5 * 88 + 20, fontFamily: MONO, fontSize: 30, color: DIM, opacity: appear(lt, 3.4) }}>
+        13 占两位 → 往后每一位都被推右一格
       </div>
     </>
   );
@@ -245,14 +234,14 @@ const S5: React.FC = () => {
   return (
     <>
       <Label x={280} y={190} text="identity" />
-      <div style={{ position: 'absolute', left: 280, top: 230, fontFamily: MONO, fontSize: 56, color: INK, opacity: appear(lt, 0.2) }}>
+      <div style={{ position: 'absolute', left: 280, top: 230, fontFamily: MONO, fontSize: 62, color: INK, opacity: appear(lt, 0.2) }}>
         <span style={{ color: DIM }}>0.</span>
         <span style={{ color: CYAN }}>01123595505617977528089887640449…</span>
       </div>
-      <div style={{ position: 'absolute', left: 280, top: 320, fontFamily: MONO, fontSize: 44, color: INK, opacity: appear(lt, 1.0) }}>
+      <div style={{ position: 'absolute', left: 280, top: 330, fontFamily: MONO, fontSize: 56, color: INK, opacity: appear(lt, 1.0) }}>
         = <span style={{ color: CYAN }}>1/89</span>
       </div>
-      <div style={{ position: 'absolute', left: 280, top: 460, fontFamily: MONO, fontSize: 40, color: INK, opacity: appear(lt, 2.2) }}>
+      <div style={{ position: 'absolute', left: 280, top: 470, fontFamily: MONO, fontSize: 48, color: INK, opacity: appear(lt, 2.2) }}>
         Σ<sub style={{ fontSize: 22 }}>n≥1</sub> F(n) / 10<span style={{ fontSize: 24, verticalAlign: 'super' }}>n+1</span>
         <span style={{ color: DIM }}> = </span>
         <span style={{ color: AMBER }}>1/89</span>
@@ -274,7 +263,7 @@ const S6: React.FC = () => {
   return (
     <>
       <Label x={280} y={190} text="one more digit of shift" />
-      <div style={{ position: 'absolute', left: 280, top: 226, fontFamily: MONO, fontSize: 52, color: INK, opacity: appear(lt, 0.1) }}>
+      <div style={{ position: 'absolute', left: 280, top: 226, fontFamily: MONO, fontSize: 58, color: INK, opacity: appear(lt, 0.1) }}>
         1 / 9899 = <span style={{ color: CYAN }}>0.</span>
       </div>
       {PAIRS.map((p, i) => {
@@ -283,9 +272,9 @@ const S6: React.FC = () => {
         return (
           <div key={i} style={{
             position: 'absolute',
-            left: 280 + 470 + i * 92,
+            left: 820 + i * 96,
             top: 300 - (1 - o) * 12,
-            fontFamily: MONO, fontSize: 54,
+            fontFamily: MONO, fontSize: 58,
             color: i < 8 ? CYAN : AMBER, opacity: o,
           }}>{p}</div>
         );
