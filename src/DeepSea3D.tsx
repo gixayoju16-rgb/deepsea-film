@@ -43,19 +43,7 @@ const Setup: React.FC = () => {
   const { gl, scene } = useThree();
   gl.toneMapping = THREE.ACESFilmicToneMapping;
   gl.toneMappingExposure = 1.4;
-  const c = document.createElement('canvas');
-  c.width = 4;
-  c.height = 256;
-  const g = c.getContext('2d')!;
-  const grd = g.createLinearGradient(0, 0, 0, 256);
-  grd.addColorStop(0, '#0a3550');
-  grd.addColorStop(0.35, '#062435');
-  grd.addColorStop(1, '#01050a');
-  g.fillStyle = grd;
-  g.fillRect(0, 0, 4, 256);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  scene.background = tex;
+  scene.background = new THREE.Color('#02080e');
   return null;
 };
 
@@ -345,15 +333,15 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
     return new THREE.LatheGeometry(pts, 22);
   }, []);
   return (
-    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]} scale={[1.55, 1.55, 1.55]}>
+    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]} scale={[1.25, 1.25, 1.25]}>
       <Wire geo={body} color="#9ae6ff" opacity={1.0} />
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
           color="#061a22"
           roughness={0.5}
           metalness={0.2}
-          emissive="#1a5d73"
-          emissiveIntensity={1.1}
+          emissive="#14505f"
+          emissiveIntensity={0.8}
         />
       </mesh>
       {/* 尾鳍 */}
