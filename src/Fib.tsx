@@ -96,7 +96,7 @@ const S1: React.FC = () => {
 };
 
 /* ---------------- S2：F 行对位 ---------------- */
-const FIB = ['0', '1', '1', '2', '3', '5', '8', '13', '21', '34', '55'];
+const FIB = ['0', '1', '1', '2', '3', '5', '8'];
 const S2: React.FC = () => {
   const lt = useLocal(1);
   const startX = 360;
@@ -118,6 +118,9 @@ const S2: React.FC = () => {
           }}>{f}</div>
         );
       })}
+      <div style={{ position: 'absolute', left: startX + 210 + 7 * cell + 40, top: 330, fontFamily: MONO, fontSize: 34, color: AMBER, opacity: appear(lt, 2.4), whiteSpace: 'nowrap' }}>
+        13 · 21 · 34 · 55 …
+      </div>
       <svg width={1920} height={1080} style={{ position: 'absolute' }}>
         {FIB.slice(0, 6).map((_, i) => {
           const o = appear(lt, 0.45 + i * 0.28, 0.3);
@@ -225,8 +228,8 @@ const S4: React.FC = () => {
           stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={340} strokeDashoffset={340 * (1 - appear(lt, 2.4, 0.8))} />
       </svg>
       <div style={{ position: 'absolute', left: colX(9) + 70, top: 280, fontFamily: MONO, fontSize: 24, color: AMBER, opacity: appear(lt, 2.8) }}>carry</div>
-      <div style={{ position: 'absolute', left: 300, top: 600, fontFamily: MONO, fontSize: 30, color: DIM, opacity: appear(lt, 3.4) }}>
-        13 占两位 → 往后每一位都被推右一格
+      <div style={{ position: 'absolute', left: 250, top: 760, width: 340, lineHeight: 1.7, fontFamily: MONO, fontSize: 26, color: DIM, opacity: appear(lt, 3.4) }}>
+        13 占两位 →<br />后面每一位都被推右一格
       </div>
     </>
   );
