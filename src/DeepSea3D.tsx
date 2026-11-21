@@ -323,8 +323,8 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
     return new THREE.LatheGeometry(pts, 22);
   }, []);
   return (
-    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]}>
-      <Wire geo={body} color="#7fd8f2" opacity={0.85} />
+    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]} scale={[1.15, 1.15, 1.15]}>
+      <Wire geo={body} color="#9ae6ff" opacity={1.0} />
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
           color="#061a22"
@@ -355,7 +355,7 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
         <sphereGeometry args={[0.55, 18, 14]} />
         <meshStandardMaterial color="#fbffff" emissive="#b8f8ff" emissiveIntensity={7} />
       </mesh>
-      <pointLight position={[-1.4, 9.2, 0]} color="#b3f6ff" intensity={70} distance={45} decay={2} />
+      <pointLight position={[-1.4, 9.2, 0]} color="#c8f8ff" intensity={160} distance={55} decay={2} />
       <pointLight position={[2, 2, -16]} color="#3fd0f0" intensity={130} distance={50} decay={2} />
     </group>
   );
@@ -364,13 +364,13 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
 
 const RedWire: React.FC<{ lit: number }> = ({ lit }) => {
   const geo = useMemo(() => new THREE.SphereGeometry(1, 20, 14), []);
-  const edges = useMemo(() => new THREE.EdgesGeometry(geo, 12), [geo]);
+  const edges = useMemo(() => new THREE.EdgesGeometry(geo, 34), [geo]);
   return (
     <lineSegments geometry={edges} scale={[9.05, 4.65, 5.45]}>
       <lineBasicMaterial
-        color={lit > 0.05 ? '#ff7f92' : '#1d4a5c'}
+        color={lit > 0.05 ? '#ff5f7a' : '#26697f'}
         transparent
-        opacity={0.25 + 0.55 * lit}
+        opacity={0.12 + 0.8 * lit}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
         fog={false}
