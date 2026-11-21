@@ -76,7 +76,7 @@ jobs:
               -map 0:v:0 -map 1:a:0 \
               -vf "ass=public/subs.ass" \
               -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
-              -c:a aac -b:a 192k -shortest \
+              -af apad -c:a aac -b:a 192k -shortest \
               out/film.mp4
           fi
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/film.mp4
