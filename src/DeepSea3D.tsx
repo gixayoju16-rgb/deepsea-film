@@ -56,7 +56,7 @@ const Wire: React.FC<{ geo: THREE.BufferGeometry; color?: string; opacity?: numb
   const edges = useMemo(() => new THREE.EdgesGeometry(geo, 18), [geo]);
   return (
     <lineSegments geometry={edges}>
-      <lineBasicMaterial color={color} transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <lineBasicMaterial color={color} transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} fog={false} />
     </lineSegments>
   );
 };
@@ -158,6 +158,7 @@ const Shaft: React.FC<{ pos: [number, number, number]; h?: number; w?: number; o
         depthWrite: false,
         blending: THREE.AdditiveBlending,
         side: THREE.DoubleSide,
+        fog: false,
       }),
     [tex, o]
   );
@@ -217,6 +218,7 @@ const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 2600 }) => {
         alphaTest={0.01}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
+        fog={false}
       />
     </points>
   );
@@ -371,6 +373,7 @@ const RedWire: React.FC<{ lit: number }> = ({ lit }) => {
         opacity={0.25 + 0.55 * lit}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
+        fog={false}
       />
     </lineSegments>
   );
@@ -462,7 +465,7 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
       <hemisphereLight args={['#1a5f80', '#010609', 0.7]} />
 
       {t < 6.4 && <Surface />}
-      <Boat />
+      {t < 7.5 && <Boat />}
       <Shaft pos={[-9, 2, -26]} h={180} w={11} o={0.30} />
       <Shaft pos={[11, 2, -34]} h={160} w={9} o={0.24} />
       <Snow t={t} />
