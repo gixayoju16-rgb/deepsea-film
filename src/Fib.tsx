@@ -59,7 +59,7 @@ const S1: React.FC = () => {
   const lt = useLocal(0);
   const { fps } = useVideoConfig();
   const startX = 300;
-  const cell = 62;
+  const cell = 56;
   const baseY = 470;
   return (
     <>
@@ -70,7 +70,7 @@ const S1: React.FC = () => {
       <div style={{ position: 'absolute', left: startX, top: baseY + 150, fontFamily: MONO, fontSize: 38, color: DIM, opacity: appear(lt, 1.0) }}>
         1 ÷ 89 = 0.
       </div>
-      {DIGITS.slice(0, 26).map((d, i) => {
+      {DIGITS.slice(0, 20).map((d, i) => {
         const at = 1.05 + i * 0.11;
         const o = appear(lt, at, 0.12);
         const isFib = i < 6;
@@ -79,15 +79,15 @@ const S1: React.FC = () => {
         return (
           <div key={i} style={{
             position: 'absolute',
-            left: startX + 200 + i * cell,
+            left: startX + 210 + i * cell,
             top: baseY + 105 - (1 - o) * 14,
-            fontFamily: MONO, fontSize: 72, color: col, opacity: o,
+            fontFamily: MONO, fontSize: 66, color: col, opacity: o,
           }}>{d}</div>
         );
       })}
-      <div style={{ position: 'absolute', left: startX + 200, top: baseY + 196, width: 6 * cell + cell * 0.42, height: 2, background: CYAN, opacity: appear(lt, 1.9) * 0.6 }} />
-      <div style={{ position: 'absolute', left: startX + 200 + 6 * cell, top: baseY + 196, width: cell * 0.42, height: 2, background: AMBER, opacity: appear(lt, 1.9) * 0.6 }} />
-      <div style={{ position: 'absolute', left: startX + 200, top: baseY + 224, fontFamily: MONO, fontSize: 22, color: DIM, opacity: appear(lt, 2.0) }}>
+      <div style={{ position: 'absolute', left: startX + 210, top: baseY + 196, width: 6 * cell + cell * 0.42, height: 2, background: CYAN, opacity: appear(lt, 1.9) * 0.6 }} />
+      <div style={{ position: 'absolute', left: startX + 210 + 6 * cell, top: baseY + 196, width: cell * 0.42, height: 2, background: AMBER, opacity: appear(lt, 1.9) * 0.6 }} />
+      <div style={{ position: 'absolute', left: startX + 210, top: baseY + 224, fontFamily: MONO, fontSize: 22, color: DIM, opacity: appear(lt, 2.0) }}>
         <span style={{ color: CYAN }}>fibonacci</span> · <span style={{ color: AMBER }}>and then?</span>
       </div>
     </>
@@ -128,7 +128,7 @@ const S2: React.FC = () => {
         const o = appear(lt, 0.1, 0.3);
         return (
           <div key={i} style={{
-            position: 'absolute', left: startX + 200 + i * cell, top: baseY + 105,
+            position: 'absolute', left: startX + 210 + i * cell, top: baseY + 105,
             fontFamily: MONO, fontSize: 62,
             color: i < 6 ? CYAN : i === 6 ? AMBER : INK, opacity: o,
           }}>{d}</div>
@@ -156,6 +156,9 @@ const Addend: React.FC<{ f: string; k: number; y: number; o: number; big?: boole
   <>
     <div style={{ position: 'absolute', left: GRID_X - 96, top: y, width: 50, textAlign: 'right', fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>+</div>
     <div style={{ position: 'absolute', left: GRID_X - 66, top: y, fontFamily: MONO, fontSize: 40, color: DIM, opacity: o }}>0.</div>
+    {Array.from({ length: k + 1 - f.length }).map((_, j) => (
+      <div key={`z${j}`} style={{ position: 'absolute', left: colX(j + 1), top: y, fontFamily: MONO, fontSize: 46, color: 'rgba(125,141,161,0.28)', opacity: o }}>0</div>
+    ))}
     {f.split('').map((d, j) => {
       const col = k + 1 - (f.length - 1 - j);
       return (
@@ -272,8 +275,8 @@ const S6: React.FC = () => {
         return (
           <div key={i} style={{
             position: 'absolute',
-            left: 820 + i * 96,
-            top: 340 - (1 - o) * 12,
+            left: 780 + i * 88,
+            top: 350 - (1 - o) * 12,
             fontFamily: MONO, fontSize: 58,
             color: i < 8 ? CYAN : AMBER, opacity: o,
           }}>{p}</div>
@@ -306,7 +309,7 @@ export const Fib: React.FC = () => {
     <AbsoluteFill>
       <AbsoluteFill style={{ transform: `scale(${zoom})`, opacity: fadeIn * fadeOut }}>
         <Grid />
-        <div style={{ position: 'absolute', inset: 0, transform: 'scale(1.1) translateY(3%)', transformOrigin: '50% 50%' }}>
+        <div style={{ position: 'absolute', inset: 0, transform: 'scale(1.12) translateY(9%)', transformOrigin: '50% 50%' }}>
         {idx === -1 && (
           <>
             <Label x={280} y={300} text="a small puzzle" />
