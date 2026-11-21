@@ -18,10 +18,10 @@ const KEYS: Key[] = [
   { t: 5.2, p: [0, 3.0, 26], l: [0, 0.8, 0] },
   { t: 10.0, p: [0, -34, 15], l: [0, -46, 0] },
   { t: 14.6, p: [0, -56, 13], l: [0, -68, 0] },
-  { t: 18.2, p: [5, -79, 46], l: [8, -93, 0] },
-  { t: 21.4, p: [-3, -111, 48], l: [-8, -127, 0] },
-  { t: 25.2, p: [0, -135, 52], l: [8, -157, -4] },
-  { t: 30.2, p: [2, -144, 46], l: [10, -170, -6] },
+  { t: 18.2, p: [5, -80, 34], l: [8, -92, 0] },
+  { t: 21.4, p: [-3, -112, 36], l: [-8, -127, 0] },
+  { t: 25.2, p: [0, -136, 40], l: [8, -157, -4] },
+  { t: 30.2, p: [2, -145, 38], l: [10, -170, -6] },
   { t: 37.2, p: [4, -150, 36], l: [8, -176, -4] },
 ];
 
@@ -264,13 +264,13 @@ const School: React.FC<{ t: number }> = ({ t }) => {
 };
 
 /* ---------- 水母 ---------- */
-const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
+const Jellyfish: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }) => {
   const pulse = 1 + Math.sin(t * 3.1) * 0.07;
   const tents = useMemo(() => Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2), []);
   const bell = useMemo(() => new THREE.SphereGeometry(5.6, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.6), []);
   const inner = useMemo(() => new THREE.SphereGeometry(4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4), []);
   return (
-    <group position={[8, -92 + Math.sin(t * 0.8) * 1.4, -2]} scale={[pulse, 1 / pulse, pulse]}>
+    <group position={[at[0], at[1] + Math.sin(t * 0.8) * 1.2, at[2]]} scale={[pulse, 1 / pulse, pulse]}>
       <mesh geometry={bell}>
         <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
@@ -312,7 +312,7 @@ const Jellyfish: React.FC<{ t: number }> = ({ t }) => {
 };
 
 /* ---------- 鮟鱇 ---------- */
-const Angler: React.FC<{ t: number }> = ({ t }) => {
+const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }) => {
   const body = useMemo(() => {
     const pts: THREE.Vector2[] = [];
     for (let i = 0; i <= 16; i++) {
@@ -323,7 +323,7 @@ const Angler: React.FC<{ t: number }> = ({ t }) => {
     return new THREE.LatheGeometry(pts, 22);
   }, []);
   return (
-    <group position={[-8, -128, -2]} rotation={[0, 0.55, 0]}>
+    <group position={[at[0], at[1], at[2]]} rotation={[0, 0.55, 0]}>
       <Wire geo={body} color="#7fd8f2" opacity={0.85} />
       <mesh geometry={body} scale={[1, 1, 0.78]} rotation={[0, 0, Math.PI / 2]}>
         <meshStandardMaterial
@@ -380,11 +380,11 @@ const RedWire: React.FC<{ lit: number }> = ({ lit }) => {
 };
 
 /* ---------- 红光生物 ---------- */
-const RedCreature: React.FC<{ beamX: number }> = ({ beamX }) => {
-  const dist = Math.abs(beamX - 10);
+const RedCreature: React.FC<{ beamX: number; at: [number, number, number] }> = ({ beamX, at }) => {
+  const dist = Math.abs(beamX - at[0]);
   const lit = clamp01(1 - dist / 13);
   return (
-    <group position={[10, -158, -6]} rotation={[0, -0.4, 0]}>
+    <group position={[at[0], at[1], at[2]]} rotation={[0, -0.4, 0]}>
       <RedWire lit={lit} />
       <mesh scale={[9, 4.6, 5.4]}>
         <sphereGeometry args={[1, 28, 20]} />
@@ -451,10 +451,12 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
   useMemo(() => {
     scene.fog = new THREE.FogExp2(0x020a10, 0.03);
   }, [scene]);
+  const cam = camAt(t);
+  const ahead: [number, number, number] = [cam.l[0], cam.l[1], cam.l[2] - 6];
   const beamX = useMemo(() => {
     const u = clamp01((t - 25.2) / 5.0);
-    return -26 + u * 64;
-  }, [t]);
+    return cam.l[0] - 22 + u * 44;
+  }, [t, cam.l[0]]);
 
   return (
     <>
@@ -470,9 +472,9 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
       <Shaft pos={[13, 2, -62]} h={140} w={9} o={0.20} />
       <Snow t={t} />
       <School t={t} />
-      <Jellyfish t={t} />
-      <Angler t={t} />
-      <RedCreature beamX={beamX} />
+      <Jellyfish t={t} at={ahead} />
+      <Angler t={t} at={ahead} />
+      <RedCreature beamX={beamX} at={ahead} />
       <Floor />
 
       {t > 24.6 && (
