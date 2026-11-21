@@ -135,10 +135,10 @@ const S2: React.FC = () => {
           }}>{d}</div>
         );
       })}
-      <div style={{ position: 'absolute', left: startX, top: 700, fontFamily: MONO, fontSize: 30, color: INK, opacity: appear(lt, 3.2) }}>
+      <div style={{ position: 'absolute', left: startX, top: 640, fontFamily: MONO, fontSize: 30, color: INK, opacity: appear(lt, 3.2) }}>
         1 1 2 3 5 8 <span style={{ color: AMBER }}>should be 8</span> → 却是 <span style={{ color: AMBER }}>9</span>
       </div>
-      <div style={{ position: 'absolute', left: startX, top: 760, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 4.2) }}>
+      <div style={{ position: 'absolute', left: startX, top: 690, fontFamily: MONO, fontSize: 24, color: DIM, opacity: appear(lt, 4.2) }}>
         因为不只是「写出来」，是「加起来」
       </div>
     </>
@@ -225,7 +225,7 @@ const S4: React.FC = () => {
           stroke={AMBER} strokeWidth={2.5} fill="none" strokeDasharray={340} strokeDashoffset={340 * (1 - appear(lt, 2.4, 0.8))} />
       </svg>
       <div style={{ position: 'absolute', left: colX(9) + 70, top: 280, fontFamily: MONO, fontSize: 24, color: AMBER, opacity: appear(lt, 2.8) }}>carry</div>
-      <div style={{ position: 'absolute', left: 300, top: y0 + 5 * 84 + 20, fontFamily: MONO, fontSize: 30, color: DIM, opacity: appear(lt, 3.4) }}>
+      <div style={{ position: 'absolute', left: 300, top: 600, fontFamily: MONO, fontSize: 30, color: DIM, opacity: appear(lt, 3.4) }}>
         13 占两位 → 往后每一位都被推右一格
       </div>
     </>
