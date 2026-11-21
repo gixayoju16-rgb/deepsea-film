@@ -449,7 +449,7 @@ const Rig: React.FC<{ t: number }> = ({ t }) => {
 const Scene: React.FC<{ t: number }> = ({ t }) => {
   const { scene } = useThree();
   useMemo(() => {
-    scene.fog = new THREE.FogExp2(0x04141f, 0.026);
+    scene.fog = new THREE.FogExp2(0x020a10, 0.03);
   }, [scene]);
   const beamX = useMemo(() => {
     const u = clamp01((t - 25.2) / 5.0);
@@ -465,9 +465,9 @@ const Scene: React.FC<{ t: number }> = ({ t }) => {
       <hemisphereLight args={['#1a5f80', '#010609', 0.7]} />
 
       {t < 6.4 && <Surface />}
-      {t < 7.5 && <Boat />}
-      <Shaft pos={[-9, 2, -26]} h={180} w={11} o={0.30} />
-      <Shaft pos={[11, 2, -34]} h={160} w={9} o={0.24} />
+      {t < 4.8 && <Boat />}
+      <Shaft pos={[-11, 2, -54]} h={150} w={12} o={0.26} />
+      <Shaft pos={[13, 2, -62]} h={140} w={9} o={0.20} />
       <Snow t={t} />
       <School t={t} />
       <Jellyfish t={t} />
