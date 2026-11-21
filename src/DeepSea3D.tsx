@@ -194,7 +194,7 @@ const getDotTex = () => {
 };
 
 /* ---------- 海雪 ---------- */
-const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 2600 }) => {
+const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 900 }) => {
   const geo = useMemo(() => {
     const g = new THREE.BufferGeometry();
     const pos = new Float32Array(n * 3);
@@ -212,10 +212,10 @@ const Snow: React.FC<{ t: number; n?: number }> = ({ t, n = 2600 }) => {
       <pointsMaterial
         map={tex}
         color="#d9f6ff"
-        size={1.1}
+        size={2.0}
         sizeAttenuation
         transparent
-        opacity={0.55}
+        opacity={0.34}
         alphaTest={0.01}
         depthWrite={false}
         blending={THREE.AdditiveBlending}
@@ -268,12 +268,21 @@ const School: React.FC<{ t: number }> = ({ t }) => {
 const Jellyfish: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }) => {
   const pulse = 1 + Math.sin(t * 3.1) * 0.07;
   const tents = useMemo(() => Array.from({ length: 12 }, (_, i) => (i / 12) * Math.PI * 2), []);
-  const bell = useMemo(() => new THREE.SphereGeometry(5.6, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.6), []);
+  const bell = useMemo(() => {
+    const pts: THREE.Vector2[] = [];
+    const N = 26;
+    for (let i = 0; i <= N; i++) {
+      const u = i / N;
+      const r = 5.8 * Math.pow(Math.sin((u * Math.PI) / 2), 0.62);
+      const y = -u * 4.4;
+      pts.push(new THREE.Vector2(r, y));
+    }
+    return new THREE.LatheGeometry(pts, 44);
+  }, []);
   const inner = useMemo(() => new THREE.SphereGeometry(4.2, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.4), []);
   return (
     <group position={[at[0], at[1] + Math.sin(t * 0.8) * 1.2, at[2]]} scale={[pulse, 1 / pulse, pulse]}>
       <mesh geometry={bell}>
-        <sphereGeometry args={[5.6, 40, 28, 0, Math.PI * 2, 0, Math.PI * 0.6]} />
         <meshStandardMaterial
           color="#0a2733"
           emissive="#1789a8"
@@ -358,6 +367,11 @@ const Angler: React.FC<{ t: number; at: [number, number, number] }> = ({ t, at }
       </mesh>
       <pointLight position={[-1.4, 9.2, 0]} color="#c8f8ff" intensity={160} distance={55} decay={2} />
       <pointLight position={[2, 2, -16]} color="#3fd0f0" intensity={130} distance={50} decay={2} />
+      {/* 嘴缝 */}
+      <mesh position={[-2.2, -0.4, 2.2]} rotation={[0.1, 0.1, -0.28]}>
+        <boxGeometry args={[7.2, 0.16, 0.16]} />
+        <meshStandardMaterial color="#071820" emissive="#71c8e0" emissiveIntensity={0.9} />
+      </mesh>
     </group>
   );
 };
@@ -387,6 +401,14 @@ const RedCreature: React.FC<{ beamX: number; at: [number, number, number] }> = (
   return (
     <group position={[at[0], at[1], at[2]]} rotation={[0, -0.4, 0]}>
       <RedWire lit={lit} />
+      <mesh position={[10, 0, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[1, 3.2, 0.35]}>
+        <coneGeometry args={[3.4, 7, 4]} />
+        <meshStandardMaterial color="#0a1116" emissive="#5c1420" emissiveIntensity={0.5 * lit} roughness={0.6} />
+      </mesh>
+      <mesh position={[2, 2.4, 0]} rotation={[0, 0, 0.5]} scale={[1, 1, 0.3]}>
+        <coneGeometry args={[1.5, 6, 4]} />
+        <meshStandardMaterial color="#0a1116" emissive="#5c1420" emissiveIntensity={0.4 * lit} roughness={0.6} />
+      </mesh>
       <mesh scale={[9, 4.6, 5.4]}>
         <sphereGeometry args={[1, 28, 20]} />
         <meshStandardMaterial color="#0a1116" roughness={0.55} metalness={0.15} emissive="#0d1b24" emissiveIntensity={0.3} />
