@@ -199,7 +199,7 @@ const S3: React.FC = () => {
 /* ---------------- S4：进位 ---------------- */
 const S4: React.FC = () => {
   const lt = useLocal(3);
-  const y0 = 340;
+  const y0 = 400;
   const rows: [string, number][] = [['5', 5], ['8', 6], ['13', 7], ['21', 8], ['34', 9]];
   return (
     <>
@@ -273,7 +273,7 @@ const S6: React.FC = () => {
           <div key={i} style={{
             position: 'absolute',
             left: 820 + i * 96,
-            top: 300 - (1 - o) * 12,
+            top: 340 - (1 - o) * 12,
             fontFamily: MONO, fontSize: 58,
             color: i < 8 ? CYAN : AMBER, opacity: o,
           }}>{p}</div>
@@ -306,6 +306,7 @@ export const Fib: React.FC = () => {
     <AbsoluteFill>
       <AbsoluteFill style={{ transform: `scale(${zoom})`, opacity: fadeIn * fadeOut }}>
         <Grid />
+        <div style={{ position: 'absolute', inset: 0, transform: 'scale(1.1) translateY(3%)', transformOrigin: '50% 50%' }}>
         {idx === -1 && (
           <>
             <Label x={280} y={300} text="a small puzzle" />
@@ -330,6 +331,7 @@ export const Fib: React.FC = () => {
             </div>
           </>
         )}
+        </div>
       </AbsoluteFill>
     </AbsoluteFill>
   );
