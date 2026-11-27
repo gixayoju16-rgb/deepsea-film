@@ -1,11 +1,11 @@
 import React from 'react';
 import { Composition } from 'remotion';
-import { Fib, TOTAL_FRAMES } from './Fib';
+import { FibB, TOTAL_FRAMES } from './FibB';
 
 export const Root: React.FC = () => (
   <Composition
     id="DeepSea"
-    component={Fib}
+    component={FibB}
     durationInFrames={TOTAL_FRAMES}
     fps={30}
     width={1920}
