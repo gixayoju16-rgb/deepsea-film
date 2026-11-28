@@ -224,7 +224,7 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
             const glow = isEmp && lit > 0.01;
             return (
               <g key={i}>
-              {glow && <path d={r.d} fill="none" stroke={C.empEdge} strokeOpacity={0.13} strokeWidth={9} />}
+              {glow && <path d={r.d} fill="none" stroke={C.empEdge} strokeOpacity={0.13} strokeWidth={7} />}
               <path
                 key={'p' + i}
                 d={r.d}
@@ -291,7 +291,6 @@ const ArrowLayer: React.FC<{ t: number; f: number; beat: Beat }> = ({ t, f, beat
             strokeLinecap="round"
             strokeDasharray="1000"
             strokeDashoffset={1000 - 1000 * Math.max(0, Math.min(1, p - i * 0.12) / 0.88)}
-            style={{ filter: 'drop-shadow(0 0 6px rgba(255,110,70,.55))' }}
           />
         </g>
       ))}
