@@ -199,17 +199,8 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
         ))}
       </svg>
 
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 1920 1080"
-        style={{
-          position: 'absolute',
-          transform: `translate(${960 + drift}px, ${540}px) scale(${(camK * 1920) / 1750}) translate(${-b.cam.x}px, ${-((b.cam.y * 1080) / 1000)}px)`,
-          transformOrigin: '0 0',
-        }}
-      >
-        <g>
+      <svg width="100%" height="100%" viewBox="0 0 1920 1080" style={{ position: 'absolute' }}>
+        <g transform={`translate(${960 + drift} ${540}) scale(${(camK * 1920) / 1750}) translate(${-b.cam.x} ${-((b.cam.y * 1080) / 1000)})`}>
           <g opacity={0.5} transform="translate(3,5)">
             {RINGS.filter((r) => r.a > 380).map((r, i) => (
               <path key={'s' + i} d={r.d} fill="#000" fillOpacity={0.8} stroke="none" />
