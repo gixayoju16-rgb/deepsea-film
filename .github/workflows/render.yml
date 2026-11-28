@@ -73,6 +73,7 @@ jobs:
           path: parts
       - name: Concat + mux
         run: |
+          mkdir -p out
           ls -R parts | head -20
           P0=parts/part-0/part.mp4; P1=parts/part-1/part.mp4
           P2=parts/part-2/part.mp4; P3=parts/part-3/part.mp4
