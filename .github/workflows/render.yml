@@ -51,7 +51,7 @@ jobs:
         run: |
           mkdir -p out
           for f in $(echo "${{ github.event.inputs.stills }}" | tr ',' ' '); do
-            npx remotion still src/index.ts DeepSea "out/still-$f.jpg" --frame=$f --image-format=jpeg
+            npx remotion still src/index.ts Napoleon "out/still-$f.jpg" --frame=$f --image-format=jpeg
           done
           ls -la out/
 
@@ -72,12 +72,20 @@ jobs:
             echo "test run, skip mux"
             cp out/silent.mp4 out/film.mp4
           else
-            ffmpeg -y -i out/silent.mp4 -i public/voice/narration.m4a \
-              -map 0:v:0 -map 1:a:0 \
-              -vf "ass=public/subs.ass" \
-              -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
-              -af apad -c:a aac -b:a 192k -shortest \
-              out/film.mp4
+            if [ -f public/subs.ass ]; then
+              ffmpeg -y -i out/silent.mp4 -i public/voice/narration.m4a \
+                -map 0:v:0 -map 1:a:0 \
+                -vf "ass=public/subs.ass" \
+                -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
+                -af apad -c:a aac -b:a 192k -shortest \
+                out/film.mp4
+            else
+              ffmpeg -y -i out/silent.mp4 -i public/voice/narration.m4a \
+                -map 0:v:0 -map 1:a:0 \
+                -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
+                -af apad -c:a aac -b:a 192k -shortest \
+                out/film.mp4
+            fi
           fi
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/film.mp4
 
