@@ -6,14 +6,14 @@ import { Grain, Vignette, ease, rnd } from './look';
 export const TOTAL = 6300; // 210s @30fps
 
 const C = {
-  sea: '#2a0a08',
-  sea2: '#160406',
-  land: '#0d0607',
-  landEdge: '#3a1512',
+  sea: '#1b0605',
+  sea2: '#0d0203',
+  land: '#1a1210',
+  landEdge: '#3d2a22',
   emp: '#9c1a13',
   empEdge: '#ff6f4d',
-  ally: '#1c2a35',
-  allyEdge: '#41627d',
+  ally: '#1f2a31',
+  allyEdge: '#3b5a74',
   gold: '#d8a54a',
   text: '#f3e4d2',
   dim: '#9a8577',
@@ -187,7 +187,7 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
       {/* 海面：径向渐变 + 经纬网 */}
       <AbsoluteFill
         style={{
-          background: `radial-gradient(120% 90% at 46% 40%, ${C.sea} 0%, ${C.sea2} 68%, #0b0203 100%)`,
+          background: `radial-gradient(120% 90% at 46% 40%, ${C.sea} 0%, ${C.sea2} 72%, #070102 100%)`,
         }}
       />
       <svg width="100%" height="100%" viewBox="0 0 1920 1080" style={{ position: 'absolute' }}>
@@ -210,29 +210,38 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
         }}
       >
         <g>
+          <g opacity={0.55} transform="translate(3,5)">
+            {RINGS.map((r, i) => (
+              <path key={'s' + i} d={r.d} fill="#000" fillOpacity={0.85} stroke="none" />
+            ))}
+          </g>
           {RINGS.map((r, i) => {
             const on = groupOn(r);
             const lit = on === Infinity ? 0 : ease(t, on, on + 1.6);
             const isEmp = ['FR', 'LOW', 'RHINE', 'IT'].includes(r.g) || r.g === 'DE';
             const base = isEmp ? C.land : r.g === 'RU' || r.g === 'AT' || r.g === 'PR' || r.g === 'GB' || r.g === 'ES' || r.g === 'PT' || r.g === 'SE' || r.g === 'DK' ? C.ally : C.land;
             const fill = isEmp ? (lit > 0.01 ? C.emp : C.land) : base;
+            const glow = isEmp && lit > 0.01;
             return (
+              <g key={i}>
+              {glow && <path d={r.d} fill="none" stroke={C.empEdge} strokeOpacity={0.13} strokeWidth={9} />}
               <path
-                key={i}
+                key={'p' + i}
                 d={r.d}
                 fill={fill}
-                fillOpacity={isEmp && lit > 0.01 ? 0.55 + 0.35 * lit : 0.9}
-                stroke={isEmp && lit > 0.01 ? C.empEdge : r.g === 'RU' || r.g === 'AT' || r.g === 'PR' ? C.allyEdge : C.landEdge}
-                strokeOpacity={isEmp && lit > 0.01 ? 0.55 : 0.5}
-                strokeWidth={isEmp && lit > 0.01 ? 1.6 : 0.9}
+                fillOpacity={isEmp && lit > 0.01 ? 0.62 + 0.3 * lit : 1}
+                stroke={isEmp && lit > 0.01 ? C.empEdge : base === C.ally ? C.allyEdge : C.landEdge}
+                strokeOpacity={isEmp && lit > 0.01 ? 0.62 : 0.75}
+                strokeWidth={isEmp && lit > 0.01 ? 1.7 : 1.0}
               />
+              </g>
             );
           })}
           {/* 波兰复国（架空手绘） */}
           {t >= 118 && (
             <g style={{ opacity: ease(t, 118, 122) }}>
               <path
-                d="M892 288 L1078 272 L1090 386 L1010 404 L906 418 Z"
+                d="M886 306 L948 286 L1024 292 L1082 316 L1078 366 L1030 392 L954 402 L906 386 Z"
                 fill={C.pol}
                 fillOpacity={0.22}
                 stroke={C.gold}
