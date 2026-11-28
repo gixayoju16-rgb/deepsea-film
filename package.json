@@ -5,7 +5,7 @@
   "description": "《假如拿破仑赢了滑铁卢》地图推演片，Remotion + GitHub Actions 云端渲染",
   "scripts": {
     "studio": "remotion studio src/index.ts",
-    "render": "remotion render src/index.ts Napoleon out/silent.mp4 --concurrency=6 --image-format=jpeg --jpeg-quality=85",
+    "render": "remotion render src/index.ts Napoleon out/silent.mp4 --concurrency=4 --image-format=jpeg --jpeg-quality=85",
     "still": "remotion still src/index.ts Napoleon out/still.jpg"
   },
   "dependencies": {
