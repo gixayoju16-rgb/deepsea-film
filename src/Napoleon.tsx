@@ -169,18 +169,52 @@ const groupOn = (r: Ring) => {
   return ON[r.g] ?? Infinity;
 };
 
+// 相机：跨 beat 连续插值（永不停下），段内再叠加缓慢推近与呼吸漂移
+const camAt = (tt: number) => {
+  const last = B.length - 1;
+  let i = 0;
+  while (i < last && tt >= B[i + 1].s) i++;
+  const a = B[i];
+  const b2 = B[Math.min(i + 1, last)];
+  const span = Math.max(0.001, b2.s - a.s);
+  const u = Math.max(0, Math.min(1, (tt - a.s) / span));
+  const e = u * u * (3 - 2 * u);
+  const x = a.cam.x + (b2.cam.x - a.cam.x) * e + Math.sin(tt * 0.55) * 4.5;
+  const y = a.cam.y + (b2.cam.y - a.cam.y) * e + Math.cos(tt * 0.42) * 3.6;
+  const k = (a.cam.k + (b2.cam.k - a.cam.k) * e) * (1 + 0.075 * u);
+  return { x, y, k };
+};
+
+
+// 漂浮尘埃 / 海雾：屏幕空间，随相机轻微视差
+const Dust: React.FC<{ t: number; cam: { x: number; y: number; k: number } }> = ({ t, cam }) => {
+  const N = 90;
+  const items = [];
+  for (let i = 0; i < N; i++) {
+    const sx = rnd(i * 7.1) * 2200;
+    const sy = rnd(i * 3.7) * 1300;
+    const sp = 8 + rnd(i * 5.3) * 26;
+    const y = ((sy - t * sp + 2600) % 1300);
+    const x = ((sx + (cam.x - 700) * 0.25 + Math.sin(t * 0.5 + i) * 10) % 2200);
+    const o = 0.05 + 0.12 * rnd(i * 9.9);
+    const r = 0.8 + rnd(i * 1.3) * 2.0;
+    items.push(<circle key={i} cx={x} cy={y} r={r} fill="#ffd9b0" fillOpacity={o} />);
+  }
+  return (
+    <g style={{ mixBlendMode: 'screen' }}>
+      {items}
+    </g>
+  );
+};
+
 const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
   const beats = B;
   const cur = beats.findIndex((b) => t >= b.s && t < b.e);
   const bi = cur < 0 ? beats.length - 1 : cur;
   const b = beats[bi];
-
-  // 相机：每个 beat 一条曲线，进入时 4 帧落位
-  const camK = interpolate(f, [(b.s + 0.4) * 30, (b.s + 2.6) * 30], [bi === 0 ? b.cam.k * 1.05 : b.cam.k * 0.97, b.cam.k], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
-  const drift = Math.sin(f / 90) * 6;
+  const cam = camAt(t);
+  const camK = cam.k;
+  const drift = 0;
 
   return (
     <AbsoluteFill style={{ background: C.sea }}>
@@ -200,7 +234,7 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
       </svg>
 
       <svg width="100%" height="100%" viewBox="0 0 1920 1080" style={{ position: 'absolute' }}>
-        <g transform={`translate(${960 + drift} ${540}) scale(${(camK * 1920) / 1750}) translate(${-b.cam.x} ${-((b.cam.y * 1080) / 1000)})`}>
+        <g transform={`translate(${960} ${540}) scale(${(camK * 1920) / 1750}) translate(${-cam.x} ${-((cam.y * 1080) / 1000)})`}>
           <g opacity={0.5} transform="translate(3,5)">
             {RINGS.filter((r) => r.a > 380).map((r, i) => (
               <path key={'s' + i} d={r.d} fill="#000" fillOpacity={0.8} stroke="none" />
@@ -208,23 +242,40 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
           </g>
           {RINGS.map((r, i) => {
             const on = groupOn(r);
-            const lit = on === Infinity ? 0 : ease(t, on, on + 1.6);
+            const lit = on === Infinity ? 0 : ease(t, on, on + 1.5);
+            const grow = on === Infinity ? 0 : ease(t, on + 0.15, on + 1.9);
             const isEmp = ['FR', 'LOW', 'RHINE', 'IT'].includes(r.g) || r.g === 'DE';
             const base = isEmp ? C.land : r.g === 'RU' || r.g === 'AT' || r.g === 'PR' || r.g === 'GB' || r.g === 'ES' || r.g === 'PT' || r.g === 'SE' || r.g === 'DK' ? C.ally : C.land;
-            const fill = isEmp ? (lit > 0.01 ? C.emp : C.land) : base;
-            const glow = isEmp && lit > 0.01;
+            const onEmp = isEmp && lit > 0.01;
+            const cid = 'clip' + i;
+            const rr = 6 + grow * 340;
             return (
               <g key={i}>
-              {glow && <path d={r.d} fill="none" stroke={C.empEdge} strokeOpacity={0.13} strokeWidth={7} />}
-              <path
-                key={'p' + i}
-                d={r.d}
-                fill={fill}
-                fillOpacity={isEmp && lit > 0.01 ? 0.62 + 0.3 * lit : 1}
-                stroke={isEmp && lit > 0.01 ? C.empEdge : base === C.ally ? C.allyEdge : C.landEdge}
-                strokeOpacity={isEmp && lit > 0.01 ? 0.62 : 0.75}
-                strokeWidth={isEmp && lit > 0.01 ? 1.7 : 1.0}
-              />
+                {isEmp && grow > 0 && grow < 1 && (
+                  <clipPath id={cid}>
+                    <circle cx={r.c[0]} cy={r.c[1]} r={rr} />
+                  </clipPath>
+                )}
+                {onEmp && <path d={r.d} fill="none" stroke={C.empEdge} strokeOpacity={0.15 * lit} strokeWidth={8} />}
+                <path
+                  d={r.d}
+                  fill={base}
+                  fillOpacity={1}
+                  stroke={base === C.ally ? C.allyEdge : C.landEdge}
+                  strokeOpacity={0.72}
+                  strokeWidth={1.05}
+                />
+                {isEmp && lit > 0.01 && (
+                  <path
+                    d={r.d}
+                    fill={C.emp}
+                    fillOpacity={0.66 + 0.3 * lit}
+                    stroke={C.empEdge}
+                    strokeOpacity={0.66}
+                    strokeWidth={1.7}
+                    clipPath={grow < 1 ? `url(#${cid})` : undefined}
+                  />
+                )}
               </g>
             );
           })}
@@ -255,6 +306,7 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
           ))}
           <ArrowLayer t={t} f={f} beat={b} />
         </g>
+        <Dust t={t} cam={cam} />
       </svg>
 
       <Vignette strength={0.42} />
