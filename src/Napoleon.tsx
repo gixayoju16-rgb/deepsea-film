@@ -210,9 +210,9 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
         }}
       >
         <g>
-          <g opacity={0.55} transform="translate(3,5)">
-            {RINGS.map((r, i) => (
-              <path key={'s' + i} d={r.d} fill="#000" fillOpacity={0.85} stroke="none" />
+          <g opacity={0.5} transform="translate(3,5)">
+            {RINGS.filter((r) => r.a > 380).map((r, i) => (
+              <path key={'s' + i} d={r.d} fill="#000" fillOpacity={0.8} stroke="none" />
             ))}
           </g>
           {RINGS.map((r, i) => {
@@ -267,7 +267,7 @@ const MapLayer: React.FC<{ t: number; f: number }> = ({ t, f }) => {
       </svg>
 
       <Vignette strength={0.42} />
-      <Grain opacity={0.05} />
+      <Grain opacity={0.045} n={260} />
     </AbsoluteFill>
   );
 };
