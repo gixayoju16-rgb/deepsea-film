@@ -1,99 +1,122 @@
 name: render-film
 
-# 手动触发：Actions 页面 → Run workflow
 on:
   workflow_dispatch:
     inputs:
       frames:
-        description: '渲染区间，如 0-320（留空=整片 1116 帧）'
+        description: '测试渲染帧区间（如 0-299）；留空=整片四路并行'
         required: false
         default: ''
       stills:
-        description: '只出静帧用于看画面，逗号分隔帧号，如 30,420,760（填了就不渲染整片）'
+        description: '只出静帧，逗号分隔帧号（如 40,150,600）'
         required: false
         default: ''
 
 jobs:
   render:
+    if: ${{ github.event.inputs.stills == '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
-
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [0, 1, 2, 3]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-
-      - name: Install system deps (ffmpeg + chromium libs + CJK fonts)
+          node-version: 20
+      - name: Install system deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            ffmpeg \
-            fonts-noto-cjk fonts-dejavu-core \
-            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
-            libgbm1 libpangocairo-1.0-0 libxkbcommon0 libxcomposite1 \
-            libxdamage1 libxfixes3 libxrandr2 libasound2t64 || \
-          sudo apt-get install -y --no-install-recommends libasound2
-          ffmpeg -version | head -1
-          fc-list | grep -i "Noto Sans CJK" | head -3
-
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 \
+            libpangocairo-1.0-0 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+            libasound2t64 || sudo apt-get install -y --no-install-recommends libasound2
       - name: Install npm deps
         run: npm install --no-audit --no-fund
-
       - name: Ensure Remotion browser
         run: npx remotion browser ensure
+      - name: Render part
+        run: |
+          if [ -n "${{ github.event.inputs.frames }}" ]; then
+            echo "test mode: ${{ github.event.inputs.frames }}"
+            npm run render -- --frames=${{ github.event.inputs.frames }}
+            cp out/silent.mp4 out/part.mp4
+          else
+            START=$(( ${{ matrix.part }} * 1575 ))
+            END=$(( START + 1574 ))
+            echo "part ${{ matrix.part }}: $START-$END"
+            npm run render -- --frames=$START-$END
+            cp out/silent.mp4 out/part.mp4
+          fi
+          ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/part.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: part-${{ matrix.part }}
+          path: out/part.mp4
+          retention-days: 30
 
+  assemble:
+    needs: render
+    if: ${{ github.event.inputs.stills == '' && github.event.inputs.frames == '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg
+        run: sudo apt-get update -y && sudo apt-get install -y --no-install-recommends ffmpeg
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: part-*
+          merge-multiple: false
+          path: parts
+      - name: Concat + mux
+        run: |
+          ls -R parts | head -20
+          P0=parts/part-0/part.mp4; P1=parts/part-1/part.mp4
+          P2=parts/part-2/part.mp4; P3=parts/part-3/part.mp4
+          ffmpeg -y -hide_banner \
+            -i $P0 -i $P1 -i $P2 -i $P3 -i public/voice/narration.m4a \
+            -filter_complex "[0:v][1:v][2:v][3:v]concat=n=4:v=1:a=0[v]" \
+            -map "[v]" -map 4:a -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p -r 30 \
+            -c:a aac -b:a 192k -af apad -shortest out/film.mp4
+          ffprobe -v error -show_entries stream=codec_type,nb_frames,duration -of default=nw=1 out/film.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deepsea-film
+          path: out/film.mp4
+          retention-days: 30
+
+  stills:
+    if: ${{ github.event.inputs.stills != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install system deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends ffmpeg fonts-noto-cjk \
+            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 \
+            libpangocairo-1.0-0 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
+            libasound2t64 || sudo apt-get install -y --no-install-recommends libasound2
+      - name: Install npm deps
+        run: npm install --no-audit --no-fund
+      - name: Ensure Remotion browser
+        run: npx remotion browser ensure
       - name: Render stills
-        if: ${{ github.event.inputs.stills != '' }}
         run: |
           mkdir -p out
           for f in $(echo "${{ github.event.inputs.stills }}" | tr ',' ' '); do
             npx remotion still src/index.ts Napoleon "out/still-$f.jpg" --frame=$f --image-format=jpeg
           done
           ls -la out/
-
-      - name: Render (silent)
-        if: ${{ github.event.inputs.stills == '' }}
-        run: |
-          if [ -n "${{ github.event.inputs.frames }}" ]; then
-            npm run render -- --frames=${{ github.event.inputs.frames }}
-          else
-            npm run render
-          fi
-          ls -la out/
-
-      - name: Mux narration + burn subtitles
-        if: ${{ github.event.inputs.stills == '' }}
-        run: |
-          if [ -n "${{ github.event.inputs.frames }}" ]; then
-            echo "test run, skip mux"
-            cp out/silent.mp4 out/film.mp4
-          else
-            if [ -f public/subs.ass ]; then
-              ffmpeg -y -i out/silent.mp4 -i public/voice/narration.m4a \
-                -map 0:v:0 -map 1:a:0 \
-                -vf "ass=public/subs.ass" \
-                -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
-                -af apad -c:a aac -b:a 192k -shortest \
-                out/film.mp4
-            else
-              ffmpeg -y -i out/silent.mp4 -i public/voice/narration.m4a \
-                -map 0:v:0 -map 1:a:0 \
-                -c:v libx264 -crf 18 -preset veryfast -pix_fmt yuv420p \
-                -af apad -c:a aac -b:a 192k -shortest \
-                out/film.mp4
-            fi
-          fi
-          ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/film.mp4
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: deepsea-film
-          path: |
-            out/film.mp4
-            out/still-*.jpg
+          path: out/still-*.jpg
           retention-days: 30
